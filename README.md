@@ -13,4 +13,5 @@ Demo - ipfs(infura) - check latest build
 ## How to Get Started(desktop)
   1. Clone the repo or download as a zip
   2. Run `yarn`
-  3. Run `yarn run start`
+  3. Run `yarn run build`
+  4. Run `yarn run start`
