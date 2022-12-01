@@ -16,7 +16,15 @@ export interface ITrade {
 }
 
 export interface ITradeWithFiatRate extends ITrade {
+    // fiatRate represents the rate of the crypto in fiat
     fiatRate: number;
+}
+
+export interface ITradeWithFrenchGain extends ITradeWithFiatRate {
+    allHoldingsValue: number;
+    totalPurchasePrice: number;
+    initialCapitalRatio: number;
+    gain: number;
 }
 
 export interface ITradeWithGains extends ITradeWithFiatRate {

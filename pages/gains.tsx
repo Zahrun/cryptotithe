@@ -1,24 +1,27 @@
 import { useContext, useState } from 'react';
 import SavedDataContext from '@contexts/savedData';
+import generateFormulaire2086 from '../src/output/Formulaire2086';
 import generateForm8949 from '../src/output/Form8949';
-import { calculateGainPerTrade, calculateGains } from '../src/processing/CalculateGains';
+import { calculateGainPerTrade, calculateGains, calculateGainsFrenchPerTrade } from '../src/processing/CalculateGains';
 import { addFiatRateToTrades } from '../src/processing/getFiatRate';
 import getYears from '../src/utils/getYears';
 import { GainsPerTradeTable } from '@components/GainsPerTradeTable';
 import TradeDetails from '@components/TradeDetails';
 import { Customize, IYearCalculationMethod } from '@components/Tabs/CalculateGainsTab/Customize.component';
-import { IHoldings, ISavedData, ITrade, ITradeWithGains, ITradeWithFiatRate, IIncomeWithFiatRate, METHOD } from '@types';
+import { IHoldings, ISavedData, ITrade, ITradeWithGains, ITradeWithFiatRate, ITradeWithFrenchGain, IIncomeWithFiatRate, METHOD } from '@types';
 import { Button, Dialog, Divider, Intent } from '@blueprintjs/core';
 import downloadFile from '@utils/downloadFile';
 
-function recalculate(
+async function recalculate(
     trades: ITradeWithFiatRate[],
     incomes: IIncomeWithFiatRate[],
     fiatCurrnecy: string,
     yearCalculationMethod: IYearCalculationMethod,
+    french: boolean = false,
 ) {
     const years = Object.keys(yearCalculationMethod);
     let newHoldings = {};
+    let previousYearTrades: ITradeWithFrenchGain[] = [];
     if (years.length !== 1) {
         for (let index = 0; index < years.length - 1; index++) {
             const pastTrades = trades.filter(
@@ -27,7 +30,13 @@ function recalculate(
             const pastIncomes = incomes.filter(
                 (income) => new Date(income.date).getFullYear() === parseInt(years[index], 10),
             );
-            const result = calculateGains(newHoldings, pastTrades, pastIncomes, fiatCurrnecy, yearCalculationMethod[years[index]]);
+            let result;
+            if (french) {
+                result = await calculateGainsFrenchPerTrade(newHoldings, previousYearTrades, pastTrades, pastIncomes, fiatCurrnecy, yearCalculationMethod[years[index]]);
+                previousYearTrades = result.frenchTrades;
+            } else {
+                result = calculateGains(newHoldings, pastTrades, pastIncomes, fiatCurrnecy, yearCalculationMethod[years[index]]);
+            }
             newHoldings = result.newHoldings;
         }
     }
@@ -48,6 +57,7 @@ function recalculate(
         holdings: newHoldings,
         trades: newTrades,
         gainCalculationMethod: yearCalculationMethod[lastYear],
+        previousYearTrades: previousYearTrades,
     };
 }
 
@@ -63,6 +73,7 @@ const Gains = () => {
     const [showWhatIfTrade, setShowWhatIfTrade] = useState(false);
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     const [, setCurrentYear] = useState(0);
+    const [processing, setProcessing] = useState(false);
 
     const onChange = (key: string, extra?: string) => (e: React.ChangeEvent<HTMLSelectElement>) => {
         switch (key) {
@@ -148,31 +159,65 @@ const Gains = () => {
                             setYearCalculationMethod,
                         )
                     }}
-                    onForm8949Export={() => downloadOutput(savedData, yearCalculationMethod)}
+                    onFormulaire2086Export={() => download2086Output(savedData, yearCalculationMethod, setProcessing)}
+                    onForm8949Export={() => download8949Output(savedData, yearCalculationMethod, setProcessing)}
                     years={years}
                     yearCalculationMethod={yearCalculationMethod}
+                    processing={processing}
                 />
             }
         </div>
     );
 }
 
-const downloadOutput = (savedData: ISavedData, yearCalculationMethod: IYearCalculationMethod) => {
-    const result = recalculate(
+const download2086Output = (savedData: ISavedData, yearCalculationMethod: IYearCalculationMethod, setProcessing: (processing: boolean) => void) => {
+    setProcessing(true);
+    recalculate(
         savedData.trades,
         savedData.incomes,
         savedData.settings.fiatCurrency,
         yearCalculationMethod,
-    );
-    const data = generateForm8949(
-        result.holdings,
-        result.trades,
-        result.incomes,
-        savedData.settings.fiatCurrency,
-        result.gainCalculationMethod,
-    );
+        true,
+    ).then(
+        function(result) {
+            generateFormulaire2086(
+            result.holdings,
+            result.previousYearTrades,
+            result.trades,
+            result.incomes,
+            savedData.settings.fiatCurrency,
+            result.gainCalculationMethod,
+        ).then(
+            function(value) {
+                setProcessing(false);
+                downloadFile(value, 'Formulaire2086.csv');
+            },
+        ).catch(e => console.log('Error: ', e));
+        },
+    ).catch(e => console.log('Error: ', e));
+}
 
-    downloadFile(data, 'Form8949.csv');
+const download8949Output = (savedData: ISavedData, yearCalculationMethod: IYearCalculationMethod, setProcessing: (processing: boolean) => void) => {
+    setProcessing(true);
+    recalculate(
+        savedData.trades,
+        savedData.incomes,
+        savedData.settings.fiatCurrency,
+        yearCalculationMethod,
+    ).then(
+        function(result) {
+            const data = generateForm8949(
+            result.holdings,
+            result.trades,
+            result.incomes,
+            savedData.settings.fiatCurrency,
+            result.gainCalculationMethod,
+            );
+            setProcessing(false);
+            downloadFile(data, 'Form8949.csv');
+        },
+    ).catch(e => console.log('Error: ', e));
+
 }
 
 const calculateWhatIfTrade = async (
@@ -210,7 +255,7 @@ const calculateGainsForTable = async (
     setShowCustomizeModal: (showCustomizeModal: boolean) => void,
     setYearCalculationMethod: (yearCalculationMethod: IYearCalculationMethod) => void,
 ) => {
-    const result = recalculate(
+    const result = await recalculate(
         savedData.trades,
         savedData.incomes,
         savedData.settings.fiatCurrency,
@@ -224,7 +269,7 @@ const calculateGainsForTable = async (
         savedData.settings.fiatCurrency,
         result.gainCalculationMethod,
     );
-    
+
     await setFilteredTradesWithGains(data.trades);
     await setLongTermGain(data.longTerm);
     await setShortTermGain(data.shortTerm);

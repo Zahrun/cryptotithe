@@ -2,8 +2,11 @@ import { addToHoldings } from '../AddToHoldings';
 import clone from 'clone';
 import holdingSelection from '../HoldingSelection';
 import { IHoldings, ITradeWithCostBasis, ITradeWithFiatRate, METHOD } from './../../types';
+import { calculateAvgerageHourPrice } from '../getFiatRate/utils';
+import { getClosestHourPrice } from '../getFiatRate/getClosestHourPrice';
 
 const FULL_YEAR_IN_MILLISECONDS = 31536000000;
+var sales = 0;
 
 export interface IProcessTrade {
     holdings: IHoldings;
@@ -131,5 +134,64 @@ export function processTrade(
         longTermCostBasis,
         shortTermProceeds,
         longTermProceeds,
+    };
+}
+
+export interface IProcessTradeFrench {
+    holdings: IHoldings;
+    allHoldingsValue: number;
+}
+
+export async function processTradeFrench(
+    holdings: IHoldings,
+    trade: ITradeWithFiatRate,
+    fiatCurrency: string,
+    method: METHOD = METHOD.FIFO,
+): Promise<IProcessTradeFrench> {
+    let newHoldings: IHoldings = clone(holdings); // to avoid a change effecting state holdings
+    let allHoldingsValue = 0;
+    let totalPurchasePrice = 0;
+
+    if (trade.boughtCurrency === fiatCurrency) {
+        sales++;
+        for (const currency of Object.keys(newHoldings)){
+            if (currency === fiatCurrency) {
+                continue;
+            }
+            let currencyHolding = 0;
+            for (const holding of newHoldings[currency]){
+                currencyHolding += holding.amount;
+            }
+            const rate = await getClosestHourPrice(currency, fiatCurrency, trade.date);
+            let value = calculateAvgerageHourPrice(rate) * currencyHolding;
+            console.debug(`${currency} holdings: ${currencyHolding} of value ${value}`);
+            allHoldingsValue += value;
+        }
+        console.info(`Sales ${sales} on ${new Date(trade.date).toLocaleDateString('fr-FR')} allHoldingsValue: ${allHoldingsValue}`);
+    } else {
+        console.info(`not a sale trade`);
+    }
+
+    const result = holdingSelection(
+        newHoldings, trade, fiatCurrency, method,
+    );
+    newHoldings = result.newHoldings;
+
+    if (trade.soldCurrency === fiatCurrency) {
+        // fiat current so add new holdings
+        newHoldings = addToHoldings(
+            newHoldings,
+            trade.boughtCurrency,
+            trade.amountSold / trade.rate,
+            trade.fiatRate,
+            trade.date,
+            trade.exchange,
+        );
+    }
+
+    return {
+        holdings: newHoldings,
+        allHoldingsValue: allHoldingsValue,
+        totalPurchasePrice: totalPurchasePrice,
     };
 }

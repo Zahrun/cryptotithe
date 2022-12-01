@@ -5,9 +5,10 @@ import {
     ITradeWithCostBasis,
     ITradeWithFiatRate,
     ITradeWithGains,
+    ITradeWithFrenchGain,
     METHOD,
 } from '../../types';
-import { processTrade } from '../ProcessTrade';
+import { processTrade, processTradeFrench } from '../ProcessTrade';
 import { addToHoldings } from '../AddToHoldings';
 
 export interface ICalculateGains {
@@ -49,6 +50,145 @@ export function calculateGains(
         newHoldings,
         longTermGain,
         shortTermGain,
+    };
+}
+
+export interface ICalculateGainsFrench {
+    newHoldings: IHoldings;
+    allHoldingsValue: number;
+    totalPurchasePrice: number;
+}
+
+export async function calculateGainsFrench(
+    holdings: IHoldings,
+    trades: ITradeWithFiatRate[],
+    incomes: IIncomeWithFiatRate[],
+    fiatCurrency: string,
+    method: METHOD = METHOD.FIFO,
+): Promise<ICalculateGainsFrench> {
+    let newHoldings: IHoldings = holdings;
+    let allHoldingsValue = 0;
+    let totalPurchasePrice = 0;
+    const incomesToApply = clone(incomes);
+    for (const trade of trades) {
+        while (incomesToApply.length && trade.date > incomesToApply[0].date) {
+            const income = incomesToApply[0];
+            newHoldings = addToHoldings(newHoldings, income.currency, income.amount, income.fiatRate, income.date);
+            incomesToApply.shift();
+        }
+
+        if (trade.soldCurrency === fiatCurrency){
+            totalPurchasePrice += trade.amountSold;
+            if (trade.transactionFee && trade.transactionFeeCurrency === trade.soldCurrency) {
+                totalPurchasePrice += trade.transactionFee;
+            }
+        }
+
+        const result = await processTradeFrench(newHoldings, trade, fiatCurrency, method);
+        newHoldings = result.holdings;
+        allHoldingsValue = result.allHoldingsValue;
+        totalPurchasePrice = totalPurchasePrice;
+    }
+
+    // apply any remaining incomes
+    for (const income of incomesToApply) {
+        newHoldings = addToHoldings(newHoldings, income.currency, income.amount, income.fiatRate, income.date);
+    }
+
+    return {
+        newHoldings: newHoldings,
+        allHoldingsValue: allHoldingsValue,
+        totalPurchasePrice: totalPurchasePrice,
+    };
+}
+
+export interface ICalculateGainsFrenchPerTrade {
+    frenchTrades: ITradeWithFrenchGain[];
+    gains: number;
+    newHoldings: IHoldings;
+}
+
+export async function calculateGainsFrenchPerTrade(
+    holdings: IHoldings,
+    previousYearTrades: ITradeWithFrenchGain[],
+    internalFormat: ITradeWithFiatRate[],
+    incomes: IIncomeWithFiatRate[],
+    fiatCurrency: string,
+    method: METHOD,
+): Promise<ICalculateGainsFrenchPerTrade> {
+    let tempHoldings: IHoldings = clone(holdings);
+    let totalPurchasePrice = 0;
+    let initialCapitalRatio = 0;
+    let gains = 0;
+    let len = previousYearTrades.length
+    if (len > 0) {
+        totalPurchasePrice = previousYearTrades[len-1].totalPurchasePrice;
+        initialCapitalRatio = previousYearTrades[len-1].initialCapitalRatio;
+    }
+    const frenchFormat: ITradeWithFrenchGain[] = [];
+    const newIncomes = clone(incomes);
+    for (const trade of internalFormat) {
+        const incomesToUse: IIncomeWithFiatRate[] = []
+        while (newIncomes.length && trade.date > newIncomes[0].date) {
+            const income = newIncomes.shift() as IIncomeWithFiatRate;
+            incomesToUse.push(income);
+        }
+
+        const result: ICalculateGainsFrench = await calculateGainsFrench(
+            tempHoldings,
+            [trade],
+            incomesToUse,
+            fiatCurrency,
+            method,
+        );
+
+        tempHoldings = result.newHoldings;
+
+        if (trade.soldCurrency === fiatCurrency){
+            totalPurchasePrice += trade.amountSold;
+            if (trade.transactionFee && trade.transactionFeeCurrency === trade.soldCurrency) {
+                totalPurchasePrice += trade.transactionFee;
+            }
+        }
+        let gain = 0;
+        let prix = trade.amountSold / trade.rate;
+        if (trade.boughtCurrency === fiatCurrency){
+            gain = (prix - trade.transactionFee - 0) -
+            (
+                (totalPurchasePrice - initialCapitalRatio - 0) *
+                (prix - 0) /
+                result.allHoldingsValue
+            )
+            gains += Math.round(gain);
+        }
+        frenchFormat.push({
+            ...trade,
+            allHoldingsValue: result.allHoldingsValue,
+            totalPurchasePrice: totalPurchasePrice,
+            initialCapitalRatio: initialCapitalRatio,
+            gain: gain,
+        });
+        if (trade.boughtCurrency === fiatCurrency){
+            initialCapitalRatio +=
+            (totalPurchasePrice - initialCapitalRatio - 0) *
+            (prix - 0) /
+            result.allHoldingsValue;
+        }
+    }
+
+
+    const applyRemainingIncomes: ICalculateGains = calculateGains(
+        tempHoldings,
+        [],
+        newIncomes,
+        fiatCurrency,
+        method
+    );
+
+    return {
+        frenchTrades: frenchFormat,
+        gains: gains,
+        newHoldings: applyRemainingIncomes.newHoldings,
     };
 }
 
