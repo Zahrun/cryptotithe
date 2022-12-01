@@ -1,4 +1,4 @@
-import { Button, Intent } from '@blueprintjs/core';
+import { Button, Intent, Spinner } from '@blueprintjs/core';
 import * as React from 'react';
 import { METHOD } from '../../../src/types';
 import CalculationMethodSelect from '../../CalculationMethodSelect';
@@ -8,9 +8,11 @@ export interface ICustomizeProps {
     onClose: () => void;
     onChange: (key: string, extra?: string) => (e: React.ChangeEvent<HTMLSelectElement>) => void;
     onGenerate: (yearCalculationMethod: IYearCalculationMethod) => void;
+    onFormulaire2086Export: () => void;
     onForm8949Export: () => void;
     years: string[];
     yearCalculationMethod: IYearCalculationMethod;
+    processing: boolean;
 }
 
 export interface ICustomizeState {
@@ -79,6 +81,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
                     yearCalculationMethods[yearCalculationMethods.length - 1]
                 ),
                 yearCalculationMethod: props.yearCalculationMethod,
+                processing: false,
             };
         } else {
             this.state = {
@@ -89,6 +92,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
                 yearCalculationMethod: {
                     0: METHOD.FIFO,
                 },
+                processing: false,
             };
         }
     }
@@ -236,10 +240,14 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
                             >
                                 Recalculate
                             </Button>
+                            <Button intent={Intent.PRIMARY} icon="export" onClick={this.props.onFormulaire2086Export}>
+                                Formulaire 2086
+                            </Button>
                             <Button intent={Intent.PRIMARY} icon="export" onClick={this.props.onForm8949Export}>
                                 Form 8949
                             </Button>
                         </div>
+                        {this.props.processing && <Spinner />}
                     </div>
                 </div>
             </Popup>
