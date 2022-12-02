@@ -39,7 +39,7 @@ export default async function processData(importDetails: IImport): Promise<ITrad
             tradeToAdd.soldCurrency = trade.Currency;
             tradeToAdd.boughtCurrency = trade['Base currency'];
             tradeToAdd.amountSold = Math.abs(parseFloat(trade.Amount));
-            tradeToAdd.rate = parseFloat(trade['Fiat amount']) / parseFloat(trade.Amount);
+            tradeToAdd.rate = parseFloat(trade.Amount) / parseFloat(trade['Fiat amount']);
         } else {
             console.log(`Error bought \"${bought}\"`);
             console.log(`Error currency \"${trade.Currency}\"`);
