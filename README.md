@@ -15,3 +15,16 @@ Demo - ipfs(infura) - check latest build
   2. Run `yarn`
   3. Run `yarn run build`
   4. Run `yarn run start`
+
+## Utilisation
+Cryptotithe welcomes the user with the choice of loading a existing data file from disk or to create a new empty data file to disk.
+  1. The "Home" tab contains the portfolio with automatically calculated current holdings in all currencies.
+  2. The "Trades" tab contains a history of all trades, which can be filtered by exchange and by currency in timeline format or in table format.
+  3. The "Import" tab allows to import trades, transactions, and incomes from csv files, or to manually enter operation details. The added operations can then be saved to the data file to be taken into account.
+     * Trades represent a trading operation of selling a currency to, in exchange, buy a different currency simulteanously.
+     * Transactions happen when an amount of currency is sent from one exchange (withdrawal) to another exchange (deposit).
+     * Incomes reflect cryptocurrency incomes such as mining, airdrops, stacking, cashback, etc.
+  4. The "Gains" tab allows to configure the gains calculation method, calculate gains, and export tax declaration form 8949. This tab also has a trade simulator feature to calculate the change in gains if a defined trade was to happen.
+  5. The "Income" tab allows to calculate the yearly incomes based on income operations.
+  6. The "Utility" tab contains various utilities such as daily balance calculation, currency rename, and transaction fee.
+  7. In the "Settings" overlay can be set the fiat rate calculation method (double average, hour average, etc.), the fiat currency to consider base, and the fiat gain calculation method (FIFO, LIFO, etc.). The data file can be saved to disk or refreshed from disk.
