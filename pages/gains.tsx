@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import SavedDataContext from '@contexts/savedData';
-import generateForm8949 from '../src/output/Form8949';
+import outputForm8949 from '../src/output/Form8949';
 import { calculateGainPerTrade, calculateGains } from '../src/processing/CalculateGains';
 import { addFiatRateToTrades } from '../src/processing/getFiatRate';
 import getYears from '../src/utils/getYears';
@@ -164,7 +164,7 @@ const downloadOutput = (savedData: ISavedData, yearCalculationMethod: IYearCalcu
         savedData.settings.fiatCurrency,
         yearCalculationMethod,
     );
-    const data = generateForm8949(
+    const data = outputForm8949(
         result.holdings,
         result.trades,
         result.incomes,
