@@ -49,7 +49,7 @@ export default async function processData(importDetails: IImport): Promise<ITrad
         tradeToAdd.ID = createID(tradeToAdd);
         tradeToAdd.exchangeID = tradeToAdd.ID;
         tradeToAdd.transactionFeeCurrency = trade['Base currency'];
-        tradeToAdd.transactionFee = parseFloat(trade.Fee);
+        tradeToAdd.transactionFee = Math.round((parseFloat(trade['Fiat amount (inc. fees)'])-parseFloat(trade['Fiat amount']))*100)/100;
         internalFormat.push(tradeToAdd as ITrade);
     }
     return internalFormat;
