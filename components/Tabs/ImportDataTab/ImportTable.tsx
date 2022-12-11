@@ -78,7 +78,7 @@ export const ImportTable = (props: IImportTableProps) => (
                 ),
                 [ImportType.TRADES]: (
                     <div>
-                        <h3 className='tc'>Trades to Add</h3>
+                        <h3 className='tc'>Trades to Add ({props.processedData.length})</h3>
                         <hr className='center w-50' />
                         <TradesTable
                             trades={props.processedData as ITrade[]}
