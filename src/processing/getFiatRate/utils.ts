@@ -1,15 +1,25 @@
 import { AxiosResponse } from 'axios';
 import { ITrade } from '../../types';
+import { getDayAvg } from './getDayAvgCurrencyRate';
 
-interface ICryptoCompareResponse {
-    [key: string]: number;
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function cryptocompareRateResponse(response: AxiosResponse<ICryptoCompareResponse>, fiatCurrency: string) {
+export async function cryptocompareRateResponse(
+    response: AxiosResponse,
+    fiatCurrency: string,
+    currency: string,
+    date: number,
+    type = 'HourVWAP',) {
     if ('data' in response) {
         try {
             const result = response.data;
-            if (result[fiatCurrency] !== 0) {
+            if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
+                    console.warn('Rate limit exceeded, retrying...');
+                    await sleep(300);
+                    return getDayAvg(fiatCurrency, currency, date, type);
+            } else if (result[fiatCurrency] !== 0) {
                 return result[fiatCurrency];
             } else {
                 return false;

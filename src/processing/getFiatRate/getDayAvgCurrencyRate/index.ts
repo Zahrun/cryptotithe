@@ -19,7 +19,7 @@ export async function getDayAvg(
             avgType: type,
         }
     });
-    const rate = cryptocompareRateResponse(response, fiatCurrency);
+    const rate = cryptocompareRateResponse(response, fiatCurrency, currency, date, type);
     return rate || 0;
 }
 
