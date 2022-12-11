@@ -3,6 +3,7 @@ export type Location = EXCHANGES | string;
 export enum EXCHANGES {
     Binance = 'BINANCE',
     Bittrex = 'BITTREX',
+    GateIO = 'GATE_IO',
     Gemini= 'GEMINI',
     Kraken = 'KRAKEN',
     Pionex = 'PIONEX',
@@ -18,6 +19,7 @@ export enum IncomeImportTypes {
 export enum ExchangesTradeHeaders {
     BINANCE = '4d0d5df894fe488872e513f6148dfa14ff29272e759b7fb3c86d264687a7cf99',
     BITTREX = '07230399aaa8d1f15e88e38bd43a01c5ef1af6c1f9131668d346e196ff090d80',
+    GATE_IO = '99ff90ddaa0826df50d15296f504ca71e4b04dff45ae7798e7ba5f688fec9209',
     GEMINI = '996edee25db7f3d1dd16c83c164c6cff8c6d0f5d6b3aafe6d1700f2a830f6c9e',
     KRAKEN = '85bf27e799cc0a30fe5b201cd6a4724e4a52feb433f41a1e8b046924e3bf8dc5',
     PIONEX = 'a09d295de934a0015f3c3abf40c87de620adcc4e41af8c684581a8f3c04952f1',
