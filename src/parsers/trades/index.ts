@@ -2,6 +2,7 @@ import { EXCHANGES, ExchangesTradeHeaders, IImport, ITrade } from '@types';
 import * as crypto from 'crypto';
 import binanceParser from './binance';
 import bittrexParser from './bittrex';
+import coinListParser from './coinlist';
 import gateIOParser from './gate.io';
 import geminiParser from './gemini';
 import krakenParser from './kraken';
@@ -12,6 +13,7 @@ import {pionexParser, pionexDustParser} from './pionex';
 const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Binance]: binanceParser,
     [EXCHANGES.Bittrex]: bittrexParser,
+    [EXCHANGES.CoinList]: coinListParser,
     [EXCHANGES.GateIO]: gateIOParser,
     [EXCHANGES.Gemini]: geminiParser,
     [EXCHANGES.Kraken]: krakenParser,
