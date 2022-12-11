@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { waitForRateLimit } from '../getFiatRate/utils';
 
 export interface ICryptoComparePriceMultiFull {
     RAW: ICryptoCompareCurrencyPriceMultiFull;
@@ -56,7 +57,13 @@ export default async function getCurrentRates(
 
     try {
         if (response.status === 200) {
-            return response.data;
+            const result = response.data;
+            if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
+                    await waitForRateLimit(result.RateLimit);
+                    return getCurrentRates(currencies, fiatCurrency);
+            } else {
+                return result;
+            }
         } else {
             throw Error('Unknown Error');
         }
