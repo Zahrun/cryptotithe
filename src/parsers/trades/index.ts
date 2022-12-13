@@ -4,6 +4,7 @@ import binanceParser from './binance';
 import bittrexParser from './bittrex';
 import geminiParser from './gemini';
 import krakenParser from './kraken';
+import liquidParser from './liquid';
 import poloniexParser from './poloniex';
 import revolutParser from './revolut';
 
@@ -12,6 +13,7 @@ const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Bittrex]: bittrexParser,
     [EXCHANGES.Gemini]: geminiParser,
     [EXCHANGES.Kraken]: krakenParser,
+    [EXCHANGES.Liquid]: liquidParser,
     [EXCHANGES.Poloniex]: poloniexParser,
     [EXCHANGES.Revolut]: revolutParser,
 }
