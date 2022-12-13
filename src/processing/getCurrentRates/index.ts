@@ -59,8 +59,8 @@ export default async function getCurrentRates(
         if (response.status === 200) {
             const result = response.data;
             if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
-                    await waitForRateLimit(result.RateLimit);
-                    return getCurrentRates(currencies, fiatCurrency);
+                await waitForRateLimit(result.RateLimit);
+                return getCurrentRates(currencies, fiatCurrency);
             } else {
                 return result;
             }

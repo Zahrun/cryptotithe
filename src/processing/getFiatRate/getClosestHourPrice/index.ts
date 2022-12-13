@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ITrade } from '../../../types';
-import { IHourlyPriceData, roundHour, waitForRateLimit } from '../utils';
+import { IHourlyPriceData, roundHour, waitForRateLimit, RateLimitError } from '../utils';
 
 export async function getClosestHourPrice(
     currency: string,
@@ -32,6 +32,9 @@ export async function getClosestHourPrice(
             }
             throw new Error('Unknown Response Type');
         } catch (ex) {
+            if (ex instanceof RateLimitError) {
+                throw ex;
+            }
             throw new Error('Error parsing JSON');
         }
     } else {

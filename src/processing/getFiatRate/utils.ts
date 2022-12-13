@@ -1,6 +1,16 @@
 import { ITrade } from '../../types';
 
+export class RateLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "RateLimitError";
+  }
+}
+
 export function sleep(ms: number, limit: string) {
+    if (['hour', 'day', 'month'].includes(limit)) {
+        throw new RateLimitError(`Rate limit exceeded for the ${limit}, would have to wait for the start of next ${limit}.\nPlease consider using an api key for cryptocompare.`);
+    }
     console.warn(`Rate limit exceeded for the ${limit}, retrying at the start of next ${limit}, in ${ms} ms...`);
     return new Promise(resolve => setTimeout(resolve, ms));
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ITrade } from '../../../types';
-import { waitForRateLimit } from '../utils';
+import { waitForRateLimit, RateLimitError } from '../utils';
 
 export async function getDayAvg(
     fiatCurrency: string,
@@ -34,6 +34,9 @@ export async function getDayAvg(
                 rate = result[fiatCurrency];
             }
         } catch (ex) {
+            if (ex instanceof RateLimitError) {
+                throw ex;
+            }
             throw new Error('Error parsing JSON');
         }
     } else {
