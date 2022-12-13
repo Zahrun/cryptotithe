@@ -6,6 +6,7 @@ import coinListParser from './coinlist';
 import gateIOParser from './gate.io';
 import geminiParser from './gemini';
 import krakenParser from './kraken';
+import liquidParser from './liquid';
 import poloniexParser from './poloniex';
 import revolutParser from './revolut';
 import {pionexParser, pionexDustParser} from './pionex';
@@ -17,6 +18,7 @@ const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.GateIO]: gateIOParser,
     [EXCHANGES.Gemini]: geminiParser,
     [EXCHANGES.Kraken]: krakenParser,
+    [EXCHANGES.Liquid]: liquidParser,
     [EXCHANGES.Poloniex]: poloniexParser,
     [EXCHANGES.Revolut]: revolutParser,
     [EXCHANGES.Pionex]: pionexParser,
