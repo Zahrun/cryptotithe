@@ -58,16 +58,25 @@ const processTrades = async (
     const newSavedData: Partial<ISavedData> = {};
     switch (importDetails.type) {
         case ImportType.TRADES: {
-            const tradesWithFiatRate: ITradeWithFiatRate[] = await addFiatRateToTrades(
-                dataToSave,
-                savedData.settings.fiatCurrency,
-                savedData.settings.fiatRateMethod,
-            );
-            const newTrades: ITradeWithFiatRate[] = sortTrades(
-                savedData.trades.concat(tradesWithFiatRate),
-            ) as ITradeWithFiatRate[];
-            newSavedData.trades = newTrades;
-            break;
+            try {
+                const tradesWithFiatRate: ITradeWithFiatRate[] = await addFiatRateToTrades(
+                    dataToSave,
+                    savedData.settings.fiatCurrency,
+                    savedData.settings.fiatRateMethod,
+                );
+                const newTrades: ITradeWithFiatRate[] = sortTrades(
+                    savedData.trades.concat(tradesWithFiatRate),
+                ) as ITradeWithFiatRate[];
+                newSavedData.trades = newTrades;
+                break;
+            } catch (ex) {
+                setProcessing(false);
+                setAlertData({
+                    message: ex.message,
+                    type: AlertType.ERROR,
+                });
+                return;
+            }
         }
         case ImportType.TRANSACTION: {
             const newTransactions: ITransaction[] = sortTransactions(

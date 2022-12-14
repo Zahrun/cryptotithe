@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ITrade } from '../../../types';
-import { IHourlyPriceData, roundHour } from '../utils';
+import { IHourlyPriceData, roundHour, waitForRateLimit, RateLimitError } from '../utils';
 
 export async function getClosestHourPrice(
     currency: string,
@@ -14,12 +14,16 @@ export async function getClosestHourPrice(
             tsym: fiatCurrency,
             limit: 1,
             toTs: tradeTime,
+            api_key: '',
         }
     });
     if ('data' in response) {
         try {
             const result: any = response.data;
-            if ('Data' in result) {
+            if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
+                    await waitForRateLimit(result.RateLimit);
+                    return getClosestHourPrice(currency, fiatCurrency, date);
+            } else if ('Data' in result) {
                 for (const hourData of result.Data as IHourlyPriceData[]) {
                     if (hourData.time <= tradeTime && tradeTime >= hourData.time + 3600) {
                         return hourData;
@@ -28,6 +32,9 @@ export async function getClosestHourPrice(
             }
             throw new Error('Unknown Response Type');
         } catch (ex) {
+            if (ex instanceof RateLimitError) {
+                throw ex;
+            }
             throw new Error('Error parsing JSON');
         }
     } else {

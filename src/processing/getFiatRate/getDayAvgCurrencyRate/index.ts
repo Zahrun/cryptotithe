@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ITrade } from '../../../types';
-import { cryptocompareRateResponse } from '../utils';
+import { waitForRateLimit, RateLimitError } from '../utils';
 
 export async function getDayAvg(
     fiatCurrency: string,
@@ -19,8 +19,30 @@ export async function getDayAvg(
             avgType: type,
         }
     });
-    const rate = cryptocompareRateResponse(response, fiatCurrency);
-    return rate || 0;
+    let rate = 0;
+    if ('data' in response) {
+        try {
+            const result = response.data;
+            if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
+                    await waitForRateLimit(result.RateLimit);
+                    getDayAvg(fiatCurrency, currency, date, type).then(
+                        function(value) {
+                            rate = value;
+                        },
+                    ).catch(e => console.log('Error: ', e));;
+            } else if (result[fiatCurrency] !== 0) {
+                rate = result[fiatCurrency];
+            }
+        } catch (ex) {
+            if (ex instanceof RateLimitError) {
+                throw ex;
+            }
+            throw new Error('Error parsing JSON');
+        }
+    } else {
+        throw new Error('Invalid Response');
+    }
+    return rate;
 }
 
 export async function getDayAvgTradeRate(
