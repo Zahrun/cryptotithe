@@ -31,7 +31,11 @@ interface ILiquid {
     account_id: string;
 }
 
-function groupByExecutionID(group: any, line: any) {
+interface ILiquidGroup {
+    [key: string]: ILiquid[];
+}
+
+function groupByExecutionID(group: ILiquidGroup, line: ILiquid) {
     group[line.execution_id] = group[line.execution_id] ?? [];
     group[line.execution_id].push(line);
     return group;
