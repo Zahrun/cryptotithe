@@ -31,63 +31,145 @@ interface ILiquid {
     account_id: string;
 }
 
+function groupByExecutionID(group: any, line: any) {
+    group[line.execution_id] = group[line.execution_id] ?? [];
+    group[line.execution_id].push(line);
+    return group;
+}
+
 export default async function processData(importDetails: IImport): Promise<ITrade[]> {
     const data: ILiquid[] = await getCSVData(importDetails.data) as ILiquid[];
     const internalFormat: ITrade[] = [];
-    if (data.length < 1) {
-        return internalFormat;
-    }
-    let splitTrade = data[0];
-    let lineContinuity = 0;
-    for (const trade of data) {
+    const sorted = data.reduce(groupByExecutionID, {});
+    for (const execution of Object.keys(sorted)) {
+        const trades = sorted[execution];
         const tradeToAdd: IPartialTrade = {
-            date : createDateAsUTC(new Date(trade.updated_at)).getTime(),
+            date : createDateAsUTC(new Date(trades[0].updated_at)).getTime(),
             exchange : EXCHANGES.Liquid,
-            exchangeID : trade.execution_id,
+            exchangeID : execution,
         };
-        switch (trade.transaction_type) {
-            case 'rebate_trade_fee':
-            case 'trade_fee':
-            case 'quick_exchange':
+        if (execution === '') {
+            for (const line of trades){
+                console.log(`Ignored ${tradeToAdd.exchange} trade of type ${line.transaction_type}`);
+                continue;
+            }
+        }
+        switch (trades[0].transaction_type) {
             case 'trade': {
-                switch (lineContinuity) {
-                    case 0: {
-                        splitTrade = trade;
-                        lineContinuity = 1;
-                        continue;
-                    }
+                switch (trades.length) {
                     case 1: {
-                        lineContinuity = 0;
-                        if (trade.directiontoUpperCase() === LiquidOrderDirection.PAY && splitTrade.direction === LiquidOrderDirection.RECEIVE) {
-                            tradeToAdd.boughtCurrency = splitTrade.currency;
-                            tradeToAdd.soldCurrency = trade.currency;
-                            tradeToAdd.amountSold = Math.abs(parseFloat(trade.gross_amount));
-                            tradeToAdd.rate = Math.abs(parseFloat(trade.gross_amount) / parseFloat(splitTrade.gross_amount));
-                        } else if (trade.direction === LiquidOrderDirection.RECEIVE && splitTrade.direction === LiquidOrderDirection.PAY) {
-                            tradeToAdd.soldCurrency = splitTrade.currency;
-                            tradeToAdd.boughtCurrency = trade.currency;
-                            tradeToAdd.amountSold = Math.abs(parseFloat(splitTrade.gross_amount));
-                            tradeToAdd.rate = Math.abs(parseFloat(splitTrade.gross_amount) / parseFloat(trade.gross_amount));
-                        } else {
-                            console.error(`Error parsing ${trade.exchange} trade splitTrade.direction=${splitTrade.direction} and trade.direction=${trade.direction}`);
-                            break;
-                        }
-                        tradeToAdd.ID = createID(tradeToAdd);
-                        internalFormat.push(tradeToAdd as ITrade);
-                        continue;
+                        internalFormat.push(addSingleLineTrade(tradeToAdd, trades[0]));
+                        break;
+                    }
+                    case 2: {
+                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1]));
+                        break;
+                    }
+                    case 3: {
+                        let feeTrade = tradeToAdd;
+                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1]));
+                        internalFormat.push(addFeeTrade(feeTrade, trades[2]));
+                        break;
+                    }
+                    case 4: {
+                        let feeTrade = tradeToAdd;
+                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1]));
+                        internalFormat.push(addFeeTrade(feeTrade, trades[2], trades[3]));
+                        break;
+                    }
+                    case 6: {
+                        internalFormat.push(addFeeTrade(tradeToAdd, trades[4], trades[5]));
+                        break;
+                    }
+                    case 8: {
+                        let secondTrade = tradeToAdd;
+                        internalFormat.push(addFeeTrade(tradeToAdd, trades[4], trades[5]));
+                        internalFormat.push(addFeeTrade(secondTrade, trades[6], trades[7]));
+                        break;
                     }
                     default: {
-                        console.error(`Error parsing ${trade.exchange} trade lineContinuity=${lineContinuity}`);
-                        break;
+                        console.warn(`Error parsing ${tradeToAdd.exchange} trade. It extends over ${trades.length} lines`);
+                        console.info(trades);
                     }
                 }
                 break;
             }
+            case 'rebate_trade_fee':
+            case 'trade_fee': {
+                console.error(`Error parsing ${tradeToAdd.exchange} trade. First line should not be of type ${trades[0].transaction_type}`);
+                break;
+            }
             default: {
-                console.log(`Ignored ${trade.exchange} trade of type ${trade.transaction_type}`);
-                continue;
+                console.log(`Ignored ${tradeToAdd.exchange} trade of type ${trades[0].transaction_type}`);
             }
         }
     }
     return internalFormat;
+}
+
+function addSingleLineTrade(
+    tradeToAdd: IPartialTrade,
+    trade: ILiquid,
+) : ITrade {
+    if (trade.direction.toUpperCase() === LiquidOrderDirection.PAY) {
+        tradeToAdd.boughtCurrency = 'USDT';
+        tradeToAdd.soldCurrency = trade.currency;
+        tradeToAdd.amountSold = parseFloat(trade.gross_amount);
+        tradeToAdd.rate = parseFloat(trade.gross_amount) / 0;
+    } else if (trade.direction.toUpperCase() === LiquidOrderDirection.RECEIVE) {
+        tradeToAdd.soldCurrency = 'USDT';
+        tradeToAdd.boughtCurrency = trade.currency;
+        tradeToAdd.amountSold = 0;
+        tradeToAdd.rate = 0 / parseFloat(trade.gross_amount);
+        // This case here above does not work. We cannot, with current structure, create a trade with nothing sold but something bought. It should be an income (airdrop). Should we process the incomes here with the trades or import the same file again as income data file?
+    }
+    else {
+        console.info(trade);
+        throw new Error(`Error parsing ${tradeToAdd.exchange} trade.direction=${trade.direction}`);
+    }
+    tradeToAdd.ID = createID(tradeToAdd);
+    return tradeToAdd as ITrade;
+}
+
+function addFeeTrade(
+    tradeToAdd: IPartialTrade,
+    feeTrade: ILiquid,
+    rebateFeeTrade?: ILiquid,
+) : ITrade {
+    let amount = parseFloat(feeTrade.gross_amount);
+    if (rebateFeeTrade !== undefined) {
+        amount -= parseFloat(rebateFeeTrade.gross_amount);
+    }
+    tradeToAdd.boughtCurrency = 'USDT';
+    tradeToAdd.soldCurrency = feeTrade.currency;
+    tradeToAdd.amountSold = amount;
+    tradeToAdd.rate = amount / 0;
+    tradeToAdd.ID = createID(tradeToAdd);
+    return tradeToAdd as ITrade;
+}
+
+function addTrade(
+    tradeToAdd: IPartialTrade,
+    firstHalf: ILiquid,
+    secondHalf: ILiquid,
+): ITrade {
+    let firstHalfDirection = firstHalf.direction.toUpperCase();
+    let secondHalfDirection = secondHalf.direction.toUpperCase();
+    if (firstHalfDirection === LiquidOrderDirection.PAY && secondHalfDirection === LiquidOrderDirection.RECEIVE) {
+        tradeToAdd.boughtCurrency = secondHalf.currency;
+        tradeToAdd.soldCurrency = firstHalf.currency;
+        tradeToAdd.amountSold = Math.abs(parseFloat(firstHalf.gross_amount));
+        tradeToAdd.rate = Math.abs(parseFloat(firstHalf.gross_amount) / parseFloat(secondHalf.gross_amount));
+    } else if (firstHalfDirection === LiquidOrderDirection.RECEIVE && secondHalfDirection === LiquidOrderDirection.PAY) {
+        tradeToAdd.soldCurrency = secondHalf.currency;
+        tradeToAdd.boughtCurrency = firstHalf.currency;
+        tradeToAdd.amountSold = Math.abs(parseFloat(secondHalf.gross_amount));
+        tradeToAdd.rate = Math.abs(parseFloat(secondHalf.gross_amount) / parseFloat(firstHalf.gross_amount));
+    } else {
+        console.info(firstHalf);
+        console.info(secondHalf);
+        throw new Error(`Error parsing ${tradeToAdd.exchange} firstHalf.direction=${firstHalf.direction} and secondHalf.direction=${secondHalf.direction}`);
+    }
+    tradeToAdd.ID = createID(tradeToAdd);
+    return tradeToAdd as ITrade;
 }

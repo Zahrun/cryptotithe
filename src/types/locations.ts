@@ -3,7 +3,6 @@ export type Location = EXCHANGES | string;
 export enum EXCHANGES {
     Bittrex = 'BITTREX',
     Gemini= 'GEMINI',
-    Kraken = 'KRAKEN',
     Liquid = 'LIQUID',
     Poloniex = 'POLONIEX',
     Kraken = 'KRAKEN',
