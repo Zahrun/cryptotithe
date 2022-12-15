@@ -45,7 +45,7 @@ export default async function processData(importDetails: IImport): Promise<ITrad
     const data: ILiquid[] = await getCSVData(importDetails.data) as ILiquid[];
     const internalFormat: ITrade[] = [];
     const sorted = data.reduce(groupByExecutionID, {});
-    for (const execution of Object.keys(sorted)) {
+    for (const execution in sorted) {
         const trades = sorted[execution];
         const tradeToAdd: IPartialTrade = {
             date : createDateAsUTC(new Date(trades[0].updated_at)).getTime(),
