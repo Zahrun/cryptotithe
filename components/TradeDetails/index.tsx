@@ -78,8 +78,8 @@ export default class TradeDetails<TradeType extends ITrade> extends
                         errors.push(`${key} must consist of only english letters`);
                         break;
                     }
-                    if (!validator.isLength(this.state[key], {min: 3, max: 5})) {
-                        errors.push(`${key} must be 3 to 5 characters long`);
+                    if (!validator.isLength(this.state[key], {min: 3, max: 7})) {
+                        errors.push(`${key} must be 3 to 7 characters long`);
                         break;
                     }
                     break;
