@@ -41,22 +41,61 @@ function groupByExecutionID(group: ILiquidGroup, line: ILiquid) {
     return group;
 }
 
+function groupByCreatedAtUTC(group: ILiquidGroup, line: ILiquid) {
+    group[line.created_at_utc] = group[line.created_at_utc] ?? [];
+    group[line.created_at_utc].push(line);
+    return group;
+}
+
 export default async function processData(importDetails: IImport): Promise<ITrade[]> {
-    const data: ILiquid[] = await getCSVData(importDetails.data) as ILiquid[];
+    let data2: ILiquid[] = [];
+    if (importDetails.data2 !== undefined ) {
+        data2 = await getCSVData(importDetails.data2) as ILiquid[];
+    }
+    const data: ILiquid[] = (await getCSVData(importDetails.data) as ILiquid[]).concat(data2);
     const internalFormat: ITrade[] = [];
-    const sorted = data.reduce(groupByExecutionID, {});
-    for (const execution in sorted) {
-        const trades = sorted[execution];
+    const sorted = data.sort(function(a, b){
+        const dateA = createDateAsUTC(new Date(a.created_at_utc)).getTime();
+        const dateB = createDateAsUTC(new Date(b.created_at_utc)).getTime();
+        return dateA - dateB;
+    });
+    const grouped = sorted.reduce(groupByExecutionID, {});
+    for (const execution in grouped) {
+        const trades = grouped[execution];
         const tradeToAdd: IPartialTrade = {
-            date : createDateAsUTC(new Date(trades[0].updated_at)).getTime(),
+            date : createDateAsUTC(new Date(trades[0].created_at_utc)).getTime(),
             exchange : EXCHANGES.Liquid,
             exchangeID : execution,
         };
         if (execution === '') {
-            for (const line of trades){
-                console.log(`Ignored ${tradeToAdd.exchange} trade of type ${line.transaction_type}`);
-                continue;
+            const dateGrouped = trades.reduce(groupByCreatedAtUTC, {});
+            for (const date in dateGrouped) {
+                const groupedTrades = dateGrouped[date];
+                const firstLine = groupedTrades[0];
+                switch (firstLine.transaction_type) {
+                    /*case 'funding': {
+                        // TODO: create a deposit transaction
+                        break;
+                    }
+                    case 'withdrawal': {
+                        // TODO: create a withdrawal transaction
+                        break;
+                    }*/
+                    case 'quick_exchange': {
+                        if (groupedTrades.length == 2) {
+                            internalFormat.push(addTrade(tradeToAdd, groupedTrades[0], groupedTrades[1]));
+                        } else {
+                            console.error(`Error parsing ${tradeToAdd.exchange} quick exchange.
+                                It extends over ${groupedTrades.length} lines`);
+                        }
+                        break;
+                    }
+                    default: {
+                        console.log(`Ignored ${tradeToAdd.exchange} trade of type ${firstLine.transaction_type}`);
+                    }
+                }
             }
+            continue;
         }
         switch (trades[0].transaction_type) {
             case 'trade': {
@@ -70,29 +109,38 @@ export default async function processData(importDetails: IImport): Promise<ITrad
                         break;
                     }
                     case 3: {
-                        let feeTrade = tradeToAdd;
-                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1]));
-                        internalFormat.push(addFeeTrade(feeTrade, trades[2]));
+                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1], trades[2]));
                         break;
                     }
                     case 4: {
-                        let feeTrade = tradeToAdd;
-                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1]));
-                        internalFormat.push(addFeeTrade(feeTrade, trades[2], trades[3]));
+                        internalFormat.push(addTrade(tradeToAdd, trades[0], trades[1], trades[2], trades[3]));
                         break;
                     }
                     case 6: {
-                        internalFormat.push(addFeeTrade(tradeToAdd, trades[4], trades[5]));
+                        let secondTrade = tradeToAdd;
+                        if (trades[0].direction !== trades[2].direction) {
+                            internalFormat.push(addTrade(tradeToAdd, trades[0], trades[2], trades[4], trades[5]));
+                            internalFormat.push(addTrade(secondTrade, trades[1], trades[3]));
+                        } else {
+                            internalFormat.push(addTrade(tradeToAdd, trades[0], trades[3], trades[4], trades[5]));
+                            internalFormat.push(addTrade(secondTrade, trades[1], trades[2]));
+                        }
                         break;
                     }
                     case 8: {
                         let secondTrade = tradeToAdd;
-                        internalFormat.push(addFeeTrade(tradeToAdd, trades[4], trades[5]));
-                        internalFormat.push(addFeeTrade(secondTrade, trades[6], trades[7]));
+                        if (trades[0].direction !== trades[2].direction) {
+                            internalFormat.push(addTrade(tradeToAdd, trades[0], trades[2], trades[4], trades[5]));
+                            internalFormat.push(addTrade(secondTrade, trades[1], trades[3], trades[6], trades[7]));
+                        } else {
+                            internalFormat.push(addTrade(tradeToAdd, trades[0], trades[3], trades[4], trades[5]));
+                            internalFormat.push(addTrade(secondTrade, trades[1], trades[2], trades[6], trades[7]));
+                        }
                         break;
                     }
                     default: {
-                        console.warn(`Error parsing ${tradeToAdd.exchange} trade. It extends over ${trades.length} lines`);
+                        console.error(`Error parsing ${tradeToAdd.exchange} trade.
+                            It extends over ${trades.length} lines`);
                         console.info(trades);
                     }
                 }
@@ -100,7 +148,8 @@ export default async function processData(importDetails: IImport): Promise<ITrad
             }
             case 'rebate_trade_fee':
             case 'trade_fee': {
-                console.error(`Error parsing ${tradeToAdd.exchange} trade. First line should not be of type ${trades[0].transaction_type}`);
+                console.error(`Error parsing ${tradeToAdd.exchange} trade.
+                    First line should not be of type ${trades[0].transaction_type}`);
                 break;
             }
             default: {
@@ -116,16 +165,18 @@ function addSingleLineTrade(
     trade: ILiquid,
 ) : ITrade {
     if (trade.direction.toUpperCase() === LiquidOrderDirection.PAY) {
-        tradeToAdd.boughtCurrency = 'USDT';
+        tradeToAdd.boughtCurrency = trade.currency;
         tradeToAdd.soldCurrency = trade.currency;
-        tradeToAdd.amountSold = parseFloat(trade.gross_amount);
-        tradeToAdd.rate = parseFloat(trade.gross_amount) / 0;
+        tradeToAdd.amountSold = 0;
+        tradeToAdd.rate = 1;
+        tradeToAdd.tradeFee = parseFloat(trade.gross_amount);
+        tradeToAdd.tradeFeeCurrency = trade.currency;
     } else if (trade.direction.toUpperCase() === LiquidOrderDirection.RECEIVE) {
+        // TODO: Replace by an income
         tradeToAdd.soldCurrency = 'USDT';
         tradeToAdd.boughtCurrency = trade.currency;
         tradeToAdd.amountSold = 0;
         tradeToAdd.rate = 0 / parseFloat(trade.gross_amount);
-        // This case here above does not work. We cannot, with current structure, create a trade with nothing sold but something bought. It should be an income (airdrop). Should we process the incomes here with the trades or import the same file again as income data file?
     }
     else {
         console.info(trade);
@@ -135,27 +186,12 @@ function addSingleLineTrade(
     return tradeToAdd as ITrade;
 }
 
-function addFeeTrade(
-    tradeToAdd: IPartialTrade,
-    feeTrade: ILiquid,
-    rebateFeeTrade?: ILiquid,
-) : ITrade {
-    let amount = parseFloat(feeTrade.gross_amount);
-    if (rebateFeeTrade !== undefined) {
-        amount -= parseFloat(rebateFeeTrade.gross_amount);
-    }
-    tradeToAdd.boughtCurrency = 'USDT';
-    tradeToAdd.soldCurrency = feeTrade.currency;
-    tradeToAdd.amountSold = amount;
-    tradeToAdd.rate = amount / 0;
-    tradeToAdd.ID = createID(tradeToAdd);
-    return tradeToAdd as ITrade;
-}
-
 function addTrade(
     tradeToAdd: IPartialTrade,
     firstHalf: ILiquid,
     secondHalf: ILiquid,
+    feeTrade?: ILiquid,
+    rebateFeeTrade?: ILiquid,
 ): ITrade {
     let firstHalfDirection = firstHalf.direction.toUpperCase();
     let secondHalfDirection = secondHalf.direction.toUpperCase();
@@ -172,7 +208,16 @@ function addTrade(
     } else {
         console.info(firstHalf);
         console.info(secondHalf);
-        throw new Error(`Error parsing ${tradeToAdd.exchange} firstHalf.direction=${firstHalf.direction} and secondHalf.direction=${secondHalf.direction}`);
+        throw new Error(`Error parsing ${tradeToAdd.exchange} firstHalf.direction=${firstHalf.direction}
+            and secondHalf.direction=${secondHalf.direction}`);
+    }
+    if (feeTrade !== undefined) {
+        let amount = parseFloat(feeTrade.gross_amount);
+        if (rebateFeeTrade !== undefined) {
+            amount -= parseFloat(rebateFeeTrade.gross_amount);
+        }
+        tradeToAdd.tradeFee = amount;
+        tradeToAdd.tradeFeeCurrency = feeTrade.currency;
     }
     tradeToAdd.ID = createID(tradeToAdd);
     return tradeToAdd as ITrade;

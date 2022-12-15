@@ -125,6 +125,7 @@ const Import = () => {
     const [showNewIncome, setShowNewIncome] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [fileBrowseOpen, setFileBrowseOpen] = useState(false);
+    const [secondFileData, setSecondFileData] = useState<string>('');
     const [processedData, setProcessedData] = useState<ProcessedDataTypes>([]);
     const [duplicateData, setDuplicateData] = useState<DuplicateDataTypes>([]);
     const [alertData, setAlertData] = useState<IAlertData | undefined>(undefined);
@@ -179,6 +180,8 @@ const Import = () => {
                         setDuplicateData,
                         setAlertData,
                         setProcessedData,
+                        secondFileData,
+                        setSecondFileData,
                     )}
                     browse={fileBrowseOpen}
                 />
@@ -305,6 +308,8 @@ const readFile = (
     setDuplicateData: (duplicateData: DuplicateDataTypes) => void,
     setAlertData: (alertData: IAlertData) => void,
     setProcessedData: (processedData: ProcessedDataTypes) => void,
+    secondFileData: string,
+    setSecondFileData: (secondFileData: string) => void,
 ) => async (
     fileData: string,
     input: React.RefObject<HTMLInputElement>
@@ -318,8 +323,16 @@ const readFile = (
                 const processedData = await processData({
                     ...importDetails,
                     data: fileData,
+                    data2: secondFileData,
                 });
-                if (processedData && processedData.length) {
+                if (typeof processedData === 'string') {
+                    setSecondFileData(fileData);
+                    alert(`To import ${processedData} completly, \
+please provide both the crypto transactions and the fiat transactions files.\n
+Please now select the other one.`);
+                    setFileBrowseOpen(true);
+                } else if (processedData && processedData.length) {
+                    setSecondFileData('');
                     const duplicateData = duplicateCheck(
                         importDetails, savedData, processedData,
                     );
