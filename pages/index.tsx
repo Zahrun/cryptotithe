@@ -29,7 +29,7 @@ const Index = ({ updateSaveData }: IIndexProps) => {
             setShowLoadDataPopup(false);
         }
       }
-    
+
       const onDataLoaded = (data: string) => {
         if (data !== '') {
           try {
@@ -37,11 +37,12 @@ const Index = ({ updateSaveData }: IIndexProps) => {
               loadData(parsedData);
               router.push(Pages.portfolio);
           } catch (ex) {
+              setShouldOpenFileBrowse(false);
               alert('Unable to parse saved data');
           }
         }
       }
-      
+
       const onCreateNew = () => {
         updateSaveData(createEmptySavedData());
         setShowLoadDataPopup(false);
