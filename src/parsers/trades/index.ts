@@ -26,7 +26,7 @@ export default async function processTradesImport(importDetails: IImport): Promi
         const headers = importDetails.data.substr(0, importDetails.data.indexOf('\n'));
         const headersHash = crypto.createHash('sha256').update(headers).digest('hex');
         for (const key in ExchangesTradeHeaders) {
-            if (ExchangesTradeHeaders[key] === headersHash) {
+            if (ExchangesTradeHeaders[key].split(';').includes(headersHash)) {
                 return processTradesImport({
                     ...importDetails,
                     location: key,
