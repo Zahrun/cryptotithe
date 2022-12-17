@@ -6,6 +6,7 @@ import geminiParser from './gemini';
 import krakenParser from './kraken';
 import poloniexParser from './poloniex';
 import revolutParser from './revolut';
+import viteParser from './vite'
 
 const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Binance]: binanceParser,
@@ -14,6 +15,7 @@ const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Kraken]: krakenParser,
     [EXCHANGES.Poloniex]: poloniexParser,
     [EXCHANGES.Revolut]: revolutParser,
+    [EXCHANGES.Vite]: viteParser,
 }
 
 export default async function processTradesImport(importDetails: IImport): Promise<ITrade[]> {
