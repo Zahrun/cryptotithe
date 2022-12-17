@@ -6,7 +6,7 @@ import geminiParser from './gemini';
 import krakenParser from './kraken';
 import poloniexParser from './poloniex';
 import revolutParser from './revolut';
-import {pionexParser, pionexDustParser} from './pionex';
+import pionexParser from './pionex';
 
 const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Binance]: binanceParser,
@@ -16,7 +16,6 @@ const parserMapping: {[key in EXCHANGES]: any} = {
     [EXCHANGES.Poloniex]: poloniexParser,
     [EXCHANGES.Revolut]: revolutParser,
     [EXCHANGES.Pionex]: pionexParser,
-    [EXCHANGES['Pionex dust collector']]: pionexDustParser,
 }
 
 export default async function processTradesImport(importDetails: IImport): Promise<ITrade[]> {
@@ -27,7 +26,7 @@ export default async function processTradesImport(importDetails: IImport): Promi
         const headers = importDetails.data.substr(0, importDetails.data.indexOf('\n'));
         const headersHash = crypto.createHash('sha256').update(headers).digest('hex');
         for (const key in ExchangesTradeHeaders) {
-            if (ExchangesTradeHeaders[key] === headersHash) {
+            if (ExchangesTradeHeaders[key].split(';').includes(headersHash)) {
                 return processTradesImport({
                     ...importDetails,
                     location: key,
