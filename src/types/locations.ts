@@ -7,6 +7,7 @@ export enum EXCHANGES {
     Kraken = 'KRAKEN',
     Binance = 'BINANCE',
     Revolut = 'REVOLUT',
+    TradeOgre = 'TRADEOGRE',
 }
 
 export enum IncomeImportTypes {
@@ -20,4 +21,5 @@ export enum ExchangesTradeHeaders {
     KRAKEN = '85bf27e799cc0a30fe5b201cd6a4724e4a52feb433f41a1e8b046924e3bf8dc5',
     BINANCE = '4d0d5df894fe488872e513f6148dfa14ff29272e759b7fb3c86d264687a7cf99',
     REVOLUT = 'ef10a780b82fdd31bb5b5f4f21eb7332c46b324513ab15418448f360f268e37c',
+    TRADEOGRE = '6828e5ff7c7adc2107f64db75ec75cdd23d159cd41bccaf9cdc0c266d62e83a6',
 }
