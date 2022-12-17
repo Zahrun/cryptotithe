@@ -37,17 +37,22 @@ export default async function processData(importDetails: IImport): Promise<ITrad
         };
         switch (trades[0]['Action type']) {
             case 'Trading Fees': {
-                if (trades[1]['Action type'] !== 'Order Filled' || trades[2]['Action type'] !== 'Order Placed') {
-                        console.error(`Error parsing ${tradeToAdd.exchange} trade
-                            trades[1]['Action type'] = ${trades[1]['Action type']}
-                            trades[2]['Action type'] = ${trades[2]['Action type']}`);
+                for (let i = 0; i < trades.length; i += 3) {
+                    let newTrade = tradeToAdd;
+                    if (trades[i+1]['Action type'] !== 'Order Filled' || trades[i+2]['Action type'] !== 'Order Placed') {
+                        console.error(`Error parsing ${newTrade.exchange} trade
+                            trades[i+1]['Action type'] = ${trades[i+1]['Action type']}
+                            trades[i+2]['Action type'] = ${trades[i+2]['Action type']}`);
+                    }
+                    newTrade.boughtCurrency = trades[i+1].Currency;
+                    newTrade.soldCurrency = trades[i+2].Currency;
+                    newTrade.amountSold = Math.abs(parseFloat(trades[i+2]['Change amount']));
+                    newTrade.rate = Math.abs(parseFloat(trades[i+2]['Change amount']) / parseFloat(trades[1]['Change amount']));
+                    newTrade.tradeFeeCurrency = trades[i].Currency;
+                    newTrade.tradeFee = Math.abs(parseFloat(trades[i]['Change amount']));
+                    newTrade.ID = createID(newTrade);
+                    internalFormat.push(newTrade as ITrade);
                 }
-                tradeToAdd.boughtCurrency = trades[1].Currency;
-                tradeToAdd.soldCurrency = trades[2].Currency;
-                tradeToAdd.amountSold = Math.abs(parseFloat(trades[2]['Change amount']));
-                tradeToAdd.rate = Math.abs(parseFloat(trades[2]['Change amount']) / parseFloat(trades[1]['Change amount']));
-                tradeToAdd.tradeFeeCurrency = trades[0].Currency;
-                tradeToAdd.tradeFee = Math.abs(parseFloat(trades[0]['Change amount']));
                 break;
             }
             case 'Points Purchase': {
@@ -60,6 +65,8 @@ export default async function processData(importDetails: IImport): Promise<ITrad
                 tradeToAdd.amountSold = Math.abs(parseFloat(trades[1]['Change amount']));
                 tradeToAdd.rate = Math.abs(parseFloat(trades[1]['Change amount']) /
                 parseFloat(trades[0]['Change amount']));
+                tradeToAdd.ID = createID(tradeToAdd);
+                internalFormat.push(tradeToAdd as ITrade);
                 break;
             }
             // TODO: Deposits, Airdrop, Withdrawals, Points With Expiration, Quant- Transferred In, Quant- Transferred Out
@@ -68,8 +75,6 @@ export default async function processData(importDetails: IImport): Promise<ITrad
                 continue;
             }
         }
-        tradeToAdd.ID = createID(tradeToAdd);
-        internalFormat.push(tradeToAdd as ITrade);
     }
     return internalFormat;
 }
