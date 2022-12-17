@@ -50,6 +50,7 @@ export default async function pionexParser(importDetails: IImport): Promise<ITra
         tradeToAdd.tradeFee = parseFloat(trade.fee);
         tradeToAdd.tradeFeeCurrency = tradeToAdd.boughtCurrency;
         tradeToAdd.ID = createID(tradeToAdd);
+        tradeToAdd.exchangeID = tradeToAdd.ID;
         internalFormat.push(tradeToAdd as ITrade);
     }
     return internalFormat;
@@ -77,6 +78,7 @@ export async function pionexDustParser(importDetails: IImport): Promise<ITrade[]
             rate : 1 / parseFloat(trade.price),
         };
         tradeToAdd.ID = createID(tradeToAdd);
+        tradeToAdd.exchangeID = tradeToAdd.ID;
         internalFormat.push(tradeToAdd as ITrade);
     }
     return internalFormat;
