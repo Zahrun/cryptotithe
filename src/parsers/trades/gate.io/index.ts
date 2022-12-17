@@ -46,8 +46,8 @@ export default async function processData(importDetails: IImport): Promise<ITrad
                 tradeToAdd.soldCurrency = trades[2].Currency;
                 tradeToAdd.amountSold = Math.abs(parseFloat(trades[2]['Change amount']));
                 tradeToAdd.rate = Math.abs(parseFloat(trades[2]['Change amount']) / parseFloat(trades[1]['Change amount']));
-                tradeToAdd.transactionFeeCurrency = trades[0].Currency;
-                tradeToAdd.transactionFee = Math.abs(parseFloat(trades[0]['Change amount']));
+                tradeToAdd.tradeFeeCurrency = trades[0].Currency;
+                tradeToAdd.tradeFee = Math.abs(parseFloat(trades[0]['Change amount']));
                 break;
             }
             case 'Points Purchase': {
