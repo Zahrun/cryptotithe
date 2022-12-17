@@ -13,45 +13,31 @@ interface ICoinList {
 export default async function processData(importDetails: IImport): Promise<ITrade[]> {
     const data: ICoinList[] = await getCSVData(importDetails.data) as ICoinList[];
     const internalFormat: ITrade[] = [];
-    if (data.length < 1) {
-        return internalFormat;
-    }
-    let splitTrade = data[0];
-    let lineContinuity = 0;
-    for (const trade of data) {
-        console.log(trade);
+    for (let i = 0; i < data.length; i++) {
+        const trade = data[i];
         const tradeToAdd: IPartialTrade = {
             date : new Date(trade.Date).getTime(),
             exchange : EXCHANGES.CoinList,
         };
         let descriptionSplit = trade.Description.split(' ');
         let type = descriptionSplit[0];
-        if (type === 'Sold' || type === 'Bought') {
-            switch (lineContinuity) {
-                case 0: {
-                    splitTrade = trade;
-                    lineContinuity = 1;
-                    continue;
-                }
-                case 1: {
-                    lineContinuity = 0;
-                    tradeToAdd.boughtCurrency = splitTrade.Asset;
-                    tradeToAdd.soldCurrency = trade.Asset;
-                    tradeToAdd.amountSold = Math.abs(parseFloat(trade.Amount));
-                    tradeToAdd.rate = Math.abs(parseFloat(trade.Amount) / parseFloat(splitTrade.Amount));
-                    tradeToAdd.ID = createID(tradeToAdd);
-                    internalFormat.push(tradeToAdd as ITrade);
-                    continue;
-                }
-                default: {
-                    console.error(`Error parsing CoinList trade lineContinuity=${lineContinuity}`);
-                    break;
-                }
+        switch (type) {
+            case 'Sold':
+            case 'Bought': {
+                i++;
+                tradeToAdd.boughtCurrency = trade.Asset;
+                tradeToAdd.soldCurrency = data[i].Asset;
+                tradeToAdd.amountSold = Math.abs(parseFloat(data[i].Amount));
+                tradeToAdd.rate = Math.abs(parseFloat(data[i].Amount) / parseFloat(trade.Amount));
+                tradeToAdd.ID = createID(tradeToAdd);
+                internalFormat.push(tradeToAdd as ITrade);
+                continue;
             }
-            break;
-        } else {
-            console.log(`Ignored CoinList trade of type ${type}`);
-            continue;
+            // TODO: Withdrawal, Distribution, Deposit, Hold
+            default: {
+                console.log(`Ignored CoinList trade of type ${type}`);
+                break;
+            }
         }
     }
     return internalFormat;
