@@ -14,76 +14,57 @@ interface IGateIO {
     'Additional Info': string;
 }
 
+interface IGateIOGroup {
+    [key: string]: IGateIO[];
+}
+
+function groupByOrderID(group: IGateIOGroup, line: IGateIO) {
+    group[line['Order id']] = group[line['Order id']] ?? [];
+    group[line['Order id']].push(line);
+    return group;
+}
+
 export default async function processData(importDetails: IImport): Promise<ITrade[]> {
     const data: IGateIO[] = await getCSVData(importDetails.data) as IGateIO[];
     const internalFormat: ITrade[] = [];
-    if (data.length < 1) {
-        return internalFormat;
-    }
-    let feeTrade = data[0];
-    let filledTrade = data[0];
-    let pointTrade = data[0];
-    let lineContinuity = 0;
-    for (const trade of data) {
+    const grouped = data.reduce(groupByOrderID, {});
+    for (const order in grouped) {
+        const trades = grouped[order];
         const tradeToAdd: IPartialTrade = {
-            date : createDateAsUTC(new Date(trade.Time)).getTime(),
-            exchangeID : trade['Order id'],
-            exchange = EXCHANGES.GateIO,
+            date : createDateAsUTC(new Date(trades[0].Time)).getTime(),
+            exchangeID : order,
+            exchange : EXCHANGES.GateIO,
         };
-        switch (trade['Action type']) {
+        switch (trades[0]['Action type']) {
             case 'Trading Fees': {
-                lineContinuity = 1;
-                feeTrade = trade;
-                continue;
-            }
-            case 'Order Filled': {
-                if (lineContinuity++ !== 1) {
-                    console.error('Error parsing Gate.io trade lineContinuity++ !== 1 lineContinuity=${lineContinuity}');
-                    lineContinuity = 0;
-                    break;
+                if (trades[1]['Action type'] !== 'Order Filled' || trades[2]['Action type'] !== 'Order Placed') {
+                        console.error(`Error parsing ${tradeToAdd.exchange} trade
+                            trades[1]['Action type'] = ${trades[1]['Action type']}
+                            trades[2]['Action type'] = ${trades[2]['Action type']}`);
                 }
-                filledTrade = trade;
-                continue;
-            }
-            case 'Order Placed': {
-                if (lineContinuity !== 2) {
-                    console.error('Error parsing Gate.io trade lineContinuity !== 2 lineContinuity=${lineContinuity}');
-                    lineContinuity = 0;
-                    break;
-                }
-                lineContinuity = 0;
-                tradeToAdd.boughtCurrency = filledTrade.Currency;
-                tradeToAdd.soldCurrency = trade.Currency;
-                tradeToAdd.amountSold = Math.abs(parseFloat(trade['Change amount']));
-                tradeToAdd.rate = Math.abs(parseFloat(trade['Change amount']) / parseFloat(filledTrade['Change amount']));
-                tradeToAdd.transactionFeeCurrency = feeTrade.Currency;
-                tradeToAdd.transactionFee = Math.abs(parseFloat(feeTrade['Change amount']));
+                tradeToAdd.boughtCurrency = trades[1].Currency;
+                tradeToAdd.soldCurrency = trades[2].Currency;
+                tradeToAdd.amountSold = Math.abs(parseFloat(trades[2]['Change amount']));
+                tradeToAdd.rate = Math.abs(parseFloat(trades[2]['Change amount']) / parseFloat(trades[1]['Change amount']));
+                tradeToAdd.transactionFeeCurrency = trades[0].Currency;
+                tradeToAdd.transactionFee = Math.abs(parseFloat(trades[0]['Change amount']));
                 break;
             }
             case 'Points Purchase': {
-                switch (lineContinuity) {
-                    case 0: {
-                        pointTrade = trade;
-                        lineContinuity = 1;
-                        continue;
-                    }
-                    case 1: {
-                        lineContinuity = 0;
-                        tradeToAdd.boughtCurrency = pointTrade.Currency;
-                        tradeToAdd.soldCurrency = trade.Currency;
-                        tradeToAdd.amountSold = Math.abs(parseFloat(trade['Change amount']));
-                        tradeToAdd.rate = Math.abs(parseFloat(trade['Change amount']) / parseFloat(pointTrade['Change amount']));
-                        break;
-                    }
-                    default: {
-                        console.error(`Error parsing Gate.io trade lineContinuity=${lineContinuity}`);
-                        break;
-                    }
+                if (trades[1]['Action type'] !== 'Points Purchase') {
+                        console.error(`Error parsing ${tradeToAdd.exchange} points purchase
+                            trades[1]['Action type'] = ${trades[1]['Action type']}`);
                 }
+                tradeToAdd.boughtCurrency = trades[0].Currency;
+                tradeToAdd.soldCurrency = trades[1].Currency;
+                tradeToAdd.amountSold = Math.abs(parseFloat(trades[1]['Change amount']));
+                tradeToAdd.rate = Math.abs(parseFloat(trades[1]['Change amount']) /
+                parseFloat(trades[0]['Change amount']));
                 break;
             }
+            // TODO: Deposits, Airdrop, Withdrawals, Points With Expiration, Quant- Transferred In, Quant- Transferred Out
             default: {
-                console.log(`Ignored Gate.io trade of type ${trade['Action type']}`);
+                console.log(`Ignored Gate.io trade of type ${trades[0]['Action type']}`);
                 continue;
             }
         }
