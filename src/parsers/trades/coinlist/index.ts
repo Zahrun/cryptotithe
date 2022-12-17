@@ -44,6 +44,7 @@ export default async function processData(importDetails: IImport): Promise<ITrad
                 tradeToAdd.amountSold = Math.abs(parseFloat(data[i].Amount));
                 tradeToAdd.rate = Math.abs(parseFloat(data[i].Amount) / parseFloat(trade.Amount));
                 tradeToAdd.ID = createID(tradeToAdd);
+                tradeToAdd.exchangeID = tradeToAdd.ID;
                 internalFormat.push(tradeToAdd as ITrade);
                 continue;
             }
@@ -77,6 +78,7 @@ export async function processProData(importDetails: IImport): Promise<ITrade[]> 
                 tradeToAdd.amountSold = Math.abs(parseFloat(data[i].amount));
                 tradeToAdd.rate = Math.abs(parseFloat(data[i].amount) / parseFloat(trade.amount));
                 tradeToAdd.ID = createID(tradeToAdd);
+                tradeToAdd.exchangeID = tradeToAdd.ID;
                 internalFormat.push(tradeToAdd as ITrade);
                 continue;
             }
