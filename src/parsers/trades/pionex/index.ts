@@ -31,6 +31,10 @@ export default async function pionexParser(importDetails: IImport): Promise<ITra
             date: createDateAsUTC(new Date(trade['date(UTC+0)'])).getTime(),
             exchange: EXCHANGES.Pionex,
         };
+        if (trade.state === 'CANCELED') {
+            console.log('Skipping canceled trade');
+            continue;
+        }
         if (trade.side.toUpperCase() === PionexOrderSide.BUY) {
             const [boughtCurrency, soldCurrency] = trade.symbol.split('_');
             tradeToAdd.boughtCurrency = boughtCurrency;
