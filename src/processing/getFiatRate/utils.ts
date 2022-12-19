@@ -16,7 +16,7 @@ export function sleep(ms: number, limit: string) {
 }
 
 export function waitForRateLimit(rateLimit: any) {
-    let now = new Date();
+    const now = new Date();
     let ms = 1000 - now.getMilliseconds();
     if (rateLimit.calls_made.second > rateLimit.max_calls.second) {
         return sleep (ms, 'second');
@@ -33,7 +33,7 @@ export function waitForRateLimit(rateLimit: any) {
     if (rateLimit.calls_made.day > rateLimit.max_calls.day) {
         return sleep (ms, 'day');
     }
-    let numberOfDaysInTheMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    const numberOfDaysInTheMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
     ms += (numberOfDaysInTheMonth - now.getDate() - 1) * 24 * 60 * 60 * 1000;
     if (rateLimit.calls_made.month > rateLimit.max_calls.month) {
         return sleep (ms, 'month');

@@ -1,7 +1,7 @@
 import { getCSVData } from '../../';
 import { EXCHANGES, IImport, IPartialTrade, ITrade } from '../../../types';
 import { createDateAsUTC, createID } from '../../utils';
-import * as assetPairs from './assetPairs.json';
+import assetPairs from './assetPairs.json';
 
 enum KrakenType {
     BUY = 'buy',

@@ -41,9 +41,9 @@ export default async function processData(importDetails: IImport): Promise<ITrad
             tradeToAdd.amountSold = Math.abs(parseFloat(trade.Amount));
             tradeToAdd.rate = parseFloat(trade.Amount) / parseFloat(trade['Fiat amount']);
         } else {
-            console.log(`Error bought \"${bought}\"`);
-            console.log(`Error currency \"${trade.Currency}\"`);
-            console.log(`Error base currency \"${trade['Base currency']}\"`);
+            console.log(`Error bought "${bought}"`);
+            console.log(`Error currency "${trade.Currency}"`);
+            console.log(`Error base currency "${trade['Base currency']}"`);
             continue;
         }
         tradeToAdd.ID = createID(tradeToAdd);

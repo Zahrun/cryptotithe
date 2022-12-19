@@ -72,9 +72,10 @@ const processTrades = async (
             } catch (ex) {
                 setProcessing(false);
                 setAlertData({
-                    message: ex.message,
+                    message: (ex as any).message,
                     type: AlertType.ERROR,
                 });
+
                 return;
             }
         }

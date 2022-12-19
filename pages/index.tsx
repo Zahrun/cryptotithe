@@ -8,7 +8,7 @@ import { createEmptySavedData } from 'src/mock';
 import { useRouter } from 'next/router';
 
 export interface IIndexProps {
-    updateSaveData: (savedData: ISavedData, shouldDownload?: Boolean) => void;
+    updateSaveData: (savedData: ISavedData, shouldDownload?: boolean) => void;
 }
 
 const isSavedDataLoaded = (data: ISavedData) => data && data.trades.length + Object.keys(data.holdings).length > 0;

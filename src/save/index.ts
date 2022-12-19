@@ -4,7 +4,7 @@ import SortTransactions from '../processing/SortTransactions';
 import SortIncomes from '../processing/SortIncome';
 import { IIncomeWithFiatRate, IPartialSavedData, ISavedData, ISettings, ITradeWithFiatRate } from '../types';
 import integrityCheck from '../utils/integrityCheck';
-import { version } from '@package';
+import packageInfo from '@package';
 
 export default function save(data: IPartialSavedData, fallback: ISavedData): ISavedData {
     const newTrades = data.trades || fallback.trades || [];
@@ -31,7 +31,7 @@ export default function save(data: IPartialSavedData, fallback: ISavedData): ISa
         incomes: sortedIncomes,
         holdings: currentHoldings,
         settings: newSettings,
-        version,
+        version: packageInfo.version,
     };
 
     savedData.integrity = integrityCheck(savedData as ISavedData);

@@ -29,7 +29,7 @@ export async function getCSVData(fileData: string): Promise<any> {
                     resolve(result.data);
                 }
             },
-            error: (error) => {
+            error: (error: papaparse.ParseError) => {
                 reject([error]);
             },
         });

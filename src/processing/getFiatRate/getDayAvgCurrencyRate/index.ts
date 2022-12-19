@@ -29,7 +29,7 @@ export async function getDayAvg(
                         function(value) {
                             rate = value;
                         },
-                    ).catch(e => console.log('Error: ', e));;
+                    ).catch(e => console.log('Error: ', e));
             } else if (result[fiatCurrency] !== 0) {
                 rate = result[fiatCurrency];
             }

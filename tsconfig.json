@@ -25,17 +25,38 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["components/*"],
-      "@pages/*": ["pages/*"],
-      "@contexts/*": ["contexts/*"],
-      "@tachyons/*": ["node_modules/tachyons/*"],
-      "@font-awesome/*": ["node_modules/font-awesome/*"],
-      "@utils/*": ["src/utils/*"],
-      "@processing/*": ["src/processing/*"],
-      "@types": ["src/types/index.ts"],
-      "@types/*": ["src/types/*"],
-      "@package": ["package.json"]
-    }
+      "@components/*": [
+        "components/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@contexts/*": [
+        "contexts/*"
+      ],
+      "@tachyons/*": [
+        "node_modules/tachyons/*"
+      ],
+      "@font-awesome/*": [
+        "node_modules/font-awesome/*"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@processing/*": [
+        "src/processing/*"
+      ],
+      "@types": [
+        "src/types/index.ts"
+      ],
+      "@types/*": [
+        "src/types/*"
+      ],
+      "@package": [
+        "package.json"
+      ]
+    },
+    "incremental": true
   },
   "include": [
     "**/*"
