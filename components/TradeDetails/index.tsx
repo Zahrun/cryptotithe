@@ -1,6 +1,6 @@
 import { Button, Intent } from '@blueprintjs/core';
 import * as React from 'react';
-import * as validator from 'validator';
+import validator from 'validator';
 import { createDateAsUTC, createID } from '../../src/parsers/utils';
 import { EXCHANGES, ISettings, ITrade } from '../../src/types';
 import { Select } from '../Select';

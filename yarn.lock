@@ -1455,10 +1455,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/validator@npm:10.11.3":
-  version: 10.11.3
-  resolution: "@types/validator@npm:10.11.3"
-  checksum: 07db233c8717043594a41d3f9e044216ed29da0e7db74b345bc6b8a6cb0e3fc4f808e98f7ce63d3912ba1890af692a9673924bfa6078493ce5576ce857b20fa0
+"@types/validator@npm:13.7.10":
+  version: 13.7.10
+  resolution: "@types/validator@npm:13.7.10"
+  checksum: 7b142c08019f484d62c9f3074231f640c24311558f157dd253a60810dd0cb29e41ec64ca210a192b54f6de51f4fe016bfeb2c30f90fa49c9337ed54a9d8e02aa
   languageName: node
   linkType: hard
 
@@ -3126,7 +3126,7 @@ __metadata:
     "@types/react": 18.0.26
     "@types/react-dom": 18.0.9
     "@types/react-infinite-scroller": ^1.2.3
-    "@types/validator": 10.11.3
+    "@types/validator": 13.7.10
     "@typescript-eslint/eslint-plugin": ^4.6.0
     "@typescript-eslint/parser": ^4.6.0
     apexcharts: 3.25.0
@@ -3159,7 +3159,7 @@ __metadata:
     tachyons: ^4.11.1
     ts-jest: ^29.0.3
     typescript: 4.9.4
-    validator: ^12.1.0
+    validator: 13.7.0
   languageName: unknown
   linkType: soft
 
@@ -10188,10 +10188,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:^12.1.0":
-  version: 12.2.0
-  resolution: "validator@npm:12.2.0"
-  checksum: f635a8136a043a47ea7ade7aac8d6735609ebd40732517ed383d7c35155767d41742a858a9dd0b63833483014c508fef90457d7ea12e9166983a39eb798b38d6
+"validator@npm:13.7.0":
+  version: 13.7.0
+  resolution: "validator@npm:13.7.0"
+  checksum: 2b83283de1222ca549a7ef57f46e8d49c6669213348db78b7045bce36a3b5843ff1e9f709ebf74574e06223461ee1f264f8cc9a26a0060a79a27de079d8286ef
   languageName: node
   linkType: hard
 
