@@ -85,6 +85,7 @@
         "axios": "^0.21.1",
         "classnames": "^2.2.6",
         "clone": "^2.1.2",
+        "cryptotithe-wasm": "0.0.4",
         "file-saver": "^2.0.5",
         "font-awesome": "^4.7.0",
         "is-electron": "2.2.1",
@@ -98,5 +99,6 @@
         "sass": "^1.56.2",
         "tachyons": "^4.11.1",
         "validator": "^12.1.0"
-    }
+    },
+    "packageManager": "yarn@1.22.19"
 }
