@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {ReactNode, useContext, useState} from 'react';
 import { IncomesTable } from '@components/IncomesTable';
 import getYears from '@utils/getYears';
 import getByYear from '../src/processing/getByYear';
@@ -8,7 +8,7 @@ import SavedDataConext from '@contexts/savedData';
 import { Button, Intent } from '@blueprintjs/core';
 import downloadFile from '@utils/downloadFile';
 
-const CalculateIncomes = () => {
+const CalculateIncomes = (): ReactNode => {
     const {savedData} = useContext(SavedDataConext);
     const [year, setYear] = useState(0);
 

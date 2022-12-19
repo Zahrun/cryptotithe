@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {ReactNode, useContext, useState} from 'react';
 import CurrencyRename from '@components/Tabs/UtilityTab/Utilities/CurrencyRename';
 import DailyBalance from '@components/Tabs/UtilityTab/Utilities/DailyBalance';
 import TransactionFee from '@components/Tabs/UtilityTab/Utilities/TransactionFee';
@@ -10,11 +10,11 @@ export enum Sections {
     TransactionFee = 'Transaction Fee',
 }
 
-const Utility = () => {
+const Utility = (): ReactNode => {
     const {savedData, save} = useContext(SavedDataContext);
     const [section, setSection] = useState(Sections.DailyBalance);
 
-    const renderSection = () => {
+    const renderSection = (): ReactNode => {
         switch (section) {
             case Sections.CurrencyRename:
                 return <CurrencyRename savedData={savedData} save={save}/>;

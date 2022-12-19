@@ -23,11 +23,11 @@ export class TradesTable extends React.Component<ITradeTableProps, {popup: strin
         };
     }
 
-    public changePopupStatus = (tradeID: string | undefined) => () => {
+    public changePopupStatus = (tradeID: string | undefined) => (): void => {
         this.setState({popup: tradeID});
     }
 
-    public editTrade = (originalID: string) => async (editedTrade: ITrade) => {
+    public editTrade = (originalID: string) => async (editedTrade: ITrade): Promise<void> => {
         const newTrades = this.props.trades.filter((trade) => trade.ID !== originalID);
         if ('fiatRate' in editedTrade) {
             const editedTradeWithFiatRate = await addFiatRateToTrades(
@@ -42,7 +42,7 @@ export class TradesTable extends React.Component<ITradeTableProps, {popup: strin
         this.setState({popup: undefined});
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div>
                 <Table

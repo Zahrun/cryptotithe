@@ -5,7 +5,7 @@ import { Pages } from '@types';
 import { useRouter } from 'next/router';
 import { Icon, Tab, Tabs } from '@blueprintjs/core';
 
-const Header = () => {
+const Header = (): JSX.Element => {
     const {savedData, save} = useContext(SavedDataConext);
     const [showSettingsPopup, setShowSettingsPopup] = useState(false);
     const router = useRouter();

@@ -7,7 +7,7 @@ export interface IImportSelectorProps {
     importDetails: IImport;
 }
 
-export const ImportSelector = (props: IImportSelectorProps) => (
+export const ImportSelector = (props: IImportSelectorProps): JSX.Element => (
     <div className='import-selector center tc mt2'>
         <label htmlFor='type' className='pr2'>Import Type</label>
         <select name='type' id='type' onChange={props.onSelectChange('type')}>

@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
+import { ReactNode, useContext, useState } from 'react';
 import SavedDataContext from '@contexts/savedData';
 import { processData } from '../src/parsers';
-import duplicateCheck from '../src/processing/DuplicateCheck';
+import duplicateCheck, {DuplicateDataTypes} from '../src/processing/DuplicateCheck';
 import { addFiatRateToTrades } from '../src/processing/getFiatRate';
 import { addFiatRateToIncomes } from '../src/processing/getFiatRateIncome'
 import sortTrades from '../src/processing/SortTrades';
@@ -15,13 +15,10 @@ import {
     IncomeImportTypes,
     ISavedData,
     ITrade,
-    ITradeWithDuplicateProbability,
     ITradeWithFiatRate,
     ITransaction,
-    ITransactionWithDuplicateProbability,
     TransactionImportType,
     IIncome,
-    IIncomeWithDuplicateProbability,
     IIncomeWithFiatRate
 } from '@types';
 import { AlertBar, AlertType } from '@components/AlertBar';
@@ -38,7 +35,6 @@ interface IAlertData {
 }
 
 type ProcessedDataTypes = ITrade[] | ITransaction[] | IIncome[];
-type DuplicateDataTypes = ITradeWithDuplicateProbability[] | ITransactionWithDuplicateProbability[] | IIncomeWithDuplicateProbability[];
 
 const processTrades = async (
     duplicateData: IDuplicate[],
@@ -52,7 +48,7 @@ const processTrades = async (
     setProcessedData: (processedData: ProcessedDataTypes) => void,
 ): Promise<void> => {
     setProcessing(true);
-    const duplicateToSave = (duplicateData as IDuplicate[]).filter((trade) => !trade.duplicate);
+    const duplicateToSave = duplicateData.filter((trade) => !trade.duplicate);
     const dataToSave = (processedData as any).concat(duplicateToSave);
 
     const newSavedData: Partial<ISavedData> = {};
@@ -120,7 +116,7 @@ const processTrades = async (
     setProcessing(false);
 }
 
-const Import = () => {
+const Import = (): ReactNode => {
     const {savedData, save} = useContext(SavedDataContext);
     const [addTrade, setAddTrade] = useState(false);
     const [showNewIncome, setShowNewIncome] = useState(false);

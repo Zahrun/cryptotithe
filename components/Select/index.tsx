@@ -36,7 +36,7 @@ export class Select extends React.PureComponent<ISelectProps, {inputVisible: boo
         }
     }
 
-    public render() {
+    public render(): React.ReactNode {
         if (this.props.inputFallback && this.state.inputVisible) {
             return (<input
                 className={this.props.className} name={this.props.name} id={this.props.id} onChange={this.onInputChange}

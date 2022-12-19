@@ -1,8 +1,11 @@
+import { NextPageContext } from "next";
+import { ReactNode } from "react";
+
 export interface IErrorProps {
     statusCode: number;
 }
 
-function Error({ statusCode }: IErrorProps) {
+function Error({ statusCode }: IErrorProps): ReactNode {
     return (
         <p>
         {statusCode
@@ -12,7 +15,7 @@ function Error({ statusCode }: IErrorProps) {
     )
 }
   
-Error.getInitialProps = ({ res, err }: any) => {
+Error.getInitialProps = ({ res, err }: NextPageContext) => {
     const statusCode = res ? res.statusCode : err ? err.statusCode : 404
     return { statusCode }
 }

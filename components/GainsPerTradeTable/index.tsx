@@ -10,7 +10,7 @@ export interface IGainsPerTradeTableProps {
 }
 
 export class GainsPerTradeTable extends React.PureComponent<IGainsPerTradeTableProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Table
                 headers={[

@@ -30,13 +30,13 @@ export default class TradeTimeline extends React.Component<ITradeTimelineProp, I
         };
     }
 
-    public moreTrades = (page: number) => {
+    public moreTrades = (page: number): void => {
         this.setState({
             page,
         });
     }
 
-    public createTimeLine = () => {
+    public createTimeLine = (): React.ReactNode[] => {
         let holdings = {};
         let trades =  Array.from(this.props.trades);
         const maxPages = Math.ceil(this.props.trades.length / tradesPerPage);
@@ -58,7 +58,7 @@ export default class TradeTimeline extends React.Component<ITradeTimelineProp, I
         }
 
         const incomes = clone(this.props.savedData.incomes);
-        return (trades.map((trade, index) => {
+        return (trades.map((trade, index): React.ReactNode => {
             const incomesToApply: IIncomeWithFiatRate[] = [];
             while (incomes.length && trade.date > incomes[0].date) {
                 incomesToApply.push(incomes.shift() as IIncomeWithFiatRate);
@@ -82,7 +82,7 @@ export default class TradeTimeline extends React.Component<ITradeTimelineProp, I
         })).reverse();
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className={classnames('tradeTimeline relative center', classes.tradeTimeline)}>
                 <InfiniteScroll

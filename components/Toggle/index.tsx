@@ -6,7 +6,7 @@ export interface IToggleProps {
 }
 
 export class Toggle extends React.PureComponent<IToggleProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <label className='toggle'>
                 <input type='checkbox' onChange={this.props.onChange} defaultChecked={this.props.defaultValue}/>

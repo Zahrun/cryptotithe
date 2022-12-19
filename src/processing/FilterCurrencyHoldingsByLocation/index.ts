@@ -1,7 +1,7 @@
 import clone from 'clone';
 import { IHoldings, Location } from '../../types';
 
-export default function filterCurrencyHoldingsByLocation(location: Location, holdings: IHoldings) {
+export default function filterCurrencyHoldingsByLocation(location: Location, holdings: IHoldings): IHoldings {
     const newHoldings = clone(holdings);
     const currencies = Object.keys(newHoldings);
     for (const currency of currencies) {

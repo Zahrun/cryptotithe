@@ -6,15 +6,11 @@ import processTradesImport from './trades';
 import processIncomesImport from './incomes';
 import processTransactionsImport from './transactions';
 
-interface IGetCSVData {
-    [key: string]: string;
-}
-
-export async function getCSVData(fileData: string): Promise<any> {
+export async function getCSVData<T>(fileData: string): Promise<T[]> {
     return new Promise((
-        resolve: (data: IGetCSVData[]) => void,
+        resolve: (data: T[]) => void,
         reject: (Error: papaparse.ParseError[]) => void,
-    ): any => {
+    ): void => {
         papaparse.parse(fileData, {
             // worker: true, // disabling as firefox throws error and wont load
             header: true,

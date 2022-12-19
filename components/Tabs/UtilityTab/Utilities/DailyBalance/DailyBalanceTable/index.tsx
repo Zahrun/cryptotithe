@@ -9,7 +9,7 @@ export interface IDailyBalanceTable {
 }
 
 export class DailyBalanceTable extends React.PureComponent<IDailyBalanceTable> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Table
                 headers={['Date', 'Holdings', 'Fiat Value']}

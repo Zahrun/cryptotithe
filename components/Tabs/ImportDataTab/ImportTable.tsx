@@ -6,17 +6,18 @@ import { DuplicateTransactionsTable } from "../../DuplicateTransactionsTable";
 import { IncomesTable } from "../../IncomesTable";
 import { TradesTable } from "../../TradesTable";
 import { TransactionsTable } from "../../TransactionsTable";
+import { DuplicateDataTypes } from "@processing/DuplicateCheck";
 
 export interface IImportTableProps {
     importDetails: IImport;
-    duplicateData: ITradeWithDuplicateProbability[] | ITransactionWithDuplicateProbability[] | IIncomeWithDuplicateProbability[];
+    duplicateData: DuplicateDataTypes;
     processedData: ITrade[] | ITransaction[] | IIncome[];
     duplicateStatusChange: (tradeID: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
     savedData: ISavedData;
     saveEditedData: (data: ITrade[] | ITradeWithFiatRate[] | ITransaction[] | IIncome[]) => void;
 }
 
-export const ImportTable = (props: IImportTableProps) => (
+export const ImportTable = (props: IImportTableProps): JSX.Element => (
     <div className="import-table">
         {props.duplicateData && props.duplicateData.length > 0 &&
             {

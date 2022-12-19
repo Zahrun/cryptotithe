@@ -1,13 +1,13 @@
-import { FiatRateMethod, IPartialSavedData } from '../../types';
+import { FiatRateMethod, ICurrencyHolding, IPartialSavedData, ITradeWithFiatRate } from '../../types';
 
 export default function converter(savedData: IPartialSavedData): boolean {
     let changeMade = false;
     if (savedData.trades !== undefined && savedData.trades.length && 'USDRate' in savedData.trades[0]) {
         changeMade = true;
         for (const trade of savedData.trades) {
-            const oldFormatTrade = trade as any;
+            const oldFormatTrade = trade as IOldTrade;
             trade.fiatRate = oldFormatTrade.USDRate;
-            delete oldFormatTrade.USDRate;
+            delete (oldFormatTrade as Partial<IOldTrade>).USDRate;
         }
     }
 
@@ -17,9 +17,9 @@ export default function converter(savedData: IPartialSavedData): boolean {
             changeMade = true;
             for (const currency of keys) {
                 for (const holding of savedData.holdings[currency]) {
-                    const oldFormatHolding = holding as any;
+                    const oldFormatHolding = holding as IOldHoldings;
                     holding.rateInFiat = oldFormatHolding.rateInUSD;
-                    delete oldFormatHolding.rateInUSD;
+                    delete (oldFormatHolding as Partial<IOldHoldings>).rateInUSD;
                 }
             }
         }
@@ -40,4 +40,12 @@ export default function converter(savedData: IPartialSavedData): boolean {
     }
 
     return changeMade;
+}
+
+interface IOldTrade extends ITradeWithFiatRate {
+    USDRate: number;
+}
+
+interface IOldHoldings extends ICurrencyHolding {
+    rateInUSD: number;
 }

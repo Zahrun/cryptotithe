@@ -7,7 +7,9 @@ import krakenParser from './kraken';
 import poloniexParser from './poloniex';
 import revolutParser from './revolut';
 
-const parserMapping: {[key in EXCHANGES]: any} = {
+type ImportType = (importDetails: IImport) => Promise<ITrade[]>;
+
+const parserMapping: {[key in EXCHANGES]: ImportType} = {
     [EXCHANGES.Binance]: binanceParser,
     [EXCHANGES.Bittrex]: bittrexParser,
     [EXCHANGES.Gemini]: geminiParser,

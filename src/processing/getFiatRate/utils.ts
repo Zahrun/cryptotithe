@@ -7,7 +7,7 @@ export class RateLimitError extends Error {
   }
 }
 
-export function sleep(ms: number, limit: string) {
+export function sleep(ms: number, limit: string): Promise<void> {
     if (['hour', 'day', 'month'].includes(limit)) {
         throw new RateLimitError(`Rate limit exceeded for the ${limit}, would have to wait for the start of next ${limit}.\nPlease consider using an api key for cryptocompare.`);
     }
@@ -15,7 +15,20 @@ export function sleep(ms: number, limit: string) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function waitForRateLimit(rateLimit: any) {
+export interface IRateLimit {
+    calls_made: IRateLimitTime;
+    max_calls: IRateLimitTime;
+}
+
+export interface IRateLimitTime {
+    second: number;
+    minute: number;
+    hour: number;
+    day: number;
+    month: number;
+}
+
+export function waitForRateLimit(rateLimit: IRateLimit): Promise<void> {
     const now = new Date();
     let ms = 1000 - now.getMilliseconds();
     if (rateLimit.calls_made.second > rateLimit.max_calls.second) {
@@ -41,7 +54,7 @@ export function waitForRateLimit(rateLimit: any) {
     return sleep (300, 'unknown');
 }
 
-export function roundHour(date: Date) {
+export function roundHour(date: Date): number {
     date.setUTCHours(date.getUTCHours() + Math.round(date.getUTCMinutes() / 60));
     date.setUTCMinutes(0);
     date.setUTCSeconds(0);
@@ -66,10 +79,10 @@ export interface IHourlyPriceData {
     close: number;
 }
 
-export function calculateAvgerageHourPrice(data: IHourlyPriceData) {
+export function calculateAvgerageHourPrice(data: IHourlyPriceData): number {
     return (data.open + data.close + data.high + data.low) / 4;
 }
 
-export function calculateAverageFromArray(avgs: number[]) {
+export function calculateAverageFromArray(avgs: number[]): number {
     return avgs.reduce((accumulator, currentValue) => accumulator + currentValue) / avgs.length;
 }

@@ -13,7 +13,7 @@ export interface ITradeFilterProps {
     onChange: (options: ITradeFilterOptions) => void;
 }
 
-export function getCurrenciesByExchange(trades: ITrade[], exchange: EXCHANGES | string) {
+export function getCurrenciesByExchange(trades: ITrade[], exchange: EXCHANGES | string): string[] {
     const exchangeTrades = (exchange === ALL_EXCHANGES ?
         trades : trades.filter((trade: ITrade) => trade.exchange === exchange)
     );
@@ -45,7 +45,7 @@ export const ALL_EXCHANGES = 'ALL';
 export const ALL_CURRENCIES = 'ALL';
 
 export class TradeFilter extends React.PureComponent<ITradeFilterProps> {
-    public onSelectChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    public onSelectChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>): void => {
         switch (key) {
             case 'exchange':
                 this.props.onChange({
@@ -64,7 +64,7 @@ export class TradeFilter extends React.PureComponent<ITradeFilterProps> {
         }
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className='trade-filter'>
                 <FormGroup

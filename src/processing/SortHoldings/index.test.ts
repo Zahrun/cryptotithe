@@ -27,7 +27,8 @@ describe('Sort Holdings', () => {
         const randomizedHoldings: IHoldings = {};
         for (const currency of currencies) {
             randomizedHoldings[currency] = [];
-            for (const _holding of holdings[currency]) {
+
+            for (let index = 0; index < holdings[currency].length; index++) {
                 randomizedHoldings[currency].push(faker.helpers.randomize(holdings[currency]));
             }
         }

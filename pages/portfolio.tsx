@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import { calculateGains } from '../src/processing/CalculateGains';
 import { calculateInDepthHoldingsValueCurrently } from '../src/processing/CalculateHoldingsValue';
 import { IHoldingsValueComplex, IPartialSavedData, ISavedData } from '@types';
@@ -15,7 +15,7 @@ export interface IPortfolioState {
 }
 
 
-const Portfolio = () => {
+const Portfolio = (): ReactNode => {
     const {savedData, save} = useContext(SavedDataConext);
     const [holdingsValue, setHoldingsValue] = useState<IHoldingsValueComplex>();
     const [series, setSeries] = useState<number[]>([]);

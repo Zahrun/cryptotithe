@@ -12,7 +12,7 @@ export class FileBrowse extends React.PureComponent<IFileBrowseProps> {
         this.fileInput = React.createRef();
     }
 
-    public componentDidUpdate(prevProps: IFileBrowseProps) {
+    public componentDidUpdate(prevProps: IFileBrowseProps): void {
         // complicated 3 boolean logic to stop some browsers(firefox/edge) from causing 2 popup windows
         if (this.props.browse) {
             if (!prevProps.browse || this.onetime) {
@@ -43,7 +43,7 @@ export class FileBrowse extends React.PureComponent<IFileBrowseProps> {
         }
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <input
                 type='file'

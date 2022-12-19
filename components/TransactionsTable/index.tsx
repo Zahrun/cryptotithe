@@ -21,11 +21,11 @@ export class TransactionsTable extends React.Component<ITransactionTableProps, {
         };
     }
 
-    public changePopupStatus = (transactionID: string | undefined) => () => {
+    public changePopupStatus = (transactionID: string | undefined) => (): void => {
         this.setState({popup: transactionID});
     }
 
-    public editTrade = (originalID: string) => async (editedTrade: ITransaction) => {
+    public editTrade = (originalID: string) => async (editedTrade: ITransaction): Promise<void> => {
         const newTransactions = this.props.transactions.filter((transaction) => transaction.ID !== originalID);
         newTransactions.push(editedTrade);
         const sortedTransactions = sortTransactions(newTransactions);
@@ -33,7 +33,7 @@ export class TransactionsTable extends React.Component<ITransactionTableProps, {
         this.setState({popup: undefined});
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div>
                 <Table

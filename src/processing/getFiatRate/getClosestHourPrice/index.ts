@@ -19,7 +19,7 @@ export async function getClosestHourPrice(
     });
     if ('data' in response) {
         try {
-            const result: any = response.data;
+            const result = response.data;
             if ('RateLimit' in result && 'max_calls' in result.RateLimit) {
                     await waitForRateLimit(result.RateLimit);
                     return getClosestHourPrice(currency, fiatCurrency, date);

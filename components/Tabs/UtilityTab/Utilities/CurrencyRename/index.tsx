@@ -29,15 +29,15 @@ export default class CurrencyRename extends React.Component<ICurrencyRenameProp,
         };
     }
 
-    public onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    public onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({newCurrency: e.currentTarget.value});
     }
 
-    public onOptionsChange = (options: ITradeFilterOptions) => {
+    public onOptionsChange = (options: ITradeFilterOptions): void => {
         this.setState({options});
     }
 
-    public rename = () => {
+    public rename = (): void => {
         this.setState({loading: true});
         const trades = this.props.savedData.trades;
         let hits = 0;
@@ -64,7 +64,7 @@ export default class CurrencyRename extends React.Component<ICurrencyRenameProp,
         });
     }
 
-    public render() {
+    public render() : React.ReactNode {
         return (
             <div className='CurrencyRename'>
                 <div className='center tc mt2'>

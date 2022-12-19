@@ -105,6 +105,6 @@ export function createEmptySavedData(): ISavedData {
 
 export const FULL_YEAR_IN_MILLISECONDS = 31536000000;
 
-export function pastDate(years: number) {
+export function pastDate(years: number): Date {
     return new Date(faker.date.recent().getTime() - FULL_YEAR_IN_MILLISECONDS * years);
 }

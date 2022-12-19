@@ -6,7 +6,7 @@ export interface IPopupProps {
 }
 
 export default class Popup extends React.PureComponent<IPopupProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className='popup'>
                 <div className='fixed w-100 h-100 top-0 right-0 left-0 bottom-0 bg-black o-70 z-1' />

@@ -61,7 +61,7 @@ const toEditedIncome = (income: IIncome): IIncomeEdited => ({
     fee: income.fee?.toString()
 });
 
-const IncomeDetails = ({income, onSave}: IIncomeDetailsProps) => {
+const IncomeDetails = ({income, onSave}: IIncomeDetailsProps): JSX.Element => {
     const [editedIncome, setEditedIncome] = useState(initalIncome(income));
 
     return (

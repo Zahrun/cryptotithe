@@ -412,7 +412,7 @@ describe('gains with Transaction Fee', () => {
         const trades = mockTradesWithFiatRate(1, currentDate(), holdings, false);
         trades[0].transactionFee = faker.random.number();
 
-        const result = calculateGainsPerHoldings(holdings, trades, fiatCurrency, METHOD.FIFO);
+        const result = calculateGainsPerHoldings(holdings, trades, [], fiatCurrency, METHOD.FIFO);
 
         expect(
             result.shortTermProceeds - result.shortTermGain - holdings[currency][0].rateInFiat * trades[0].amountSold,
@@ -495,7 +495,7 @@ describe('calculateGainsPerHoldings', () => {
     test('structure unchanges', () => {
         const holdings: IHoldings = mockHoldings(1, 1, recentDate());
         const trades: ITradeWithFiatRate[] = mockTradesWithFiatRate(1, recentDate(1), holdings, false);
-        const result = calculateGainsPerHoldings(holdings, trades, fiatCurrency, METHOD.FIFO);
+        const result = calculateGainsPerHoldings(holdings, trades, [], fiatCurrency, METHOD.FIFO);
 
         expect('shortTermTrades' in result).toBeTruthy();
         expect('longTermTrades' in result).toBeTruthy();
@@ -515,7 +515,7 @@ describe('calculateGainsPerHoldings', () => {
         holdings[currency][0].date = pastDate(10).getTime();
         const trades: ITradeWithFiatRate[] = mockTradesWithFiatRate(5, recentDate(1), holdings, false);
         trades[0].amountSold = holdings[currency][0].amount;
-        const result = calculateGainsPerHoldings(holdings, trades, fiatCurrency, METHOD.FIFO);
+        const result = calculateGainsPerHoldings(holdings, trades, [], fiatCurrency, METHOD.FIFO);
         expect(result.shortTermTrades.length).toBeGreaterThan(0);
         expect(result.longTermTrades.length).toBeGreaterThan(0);
 

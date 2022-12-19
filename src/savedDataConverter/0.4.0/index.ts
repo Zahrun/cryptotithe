@@ -1,5 +1,5 @@
 import { createID } from '../../parsers/utils';
-import { ISavedData } from '../../types';
+import { ISavedData, ITradeWithFiatRate } from '../../types';
 
 export default function converter(savedData: ISavedData): boolean {
     let changeMade = false;
@@ -7,8 +7,8 @@ export default function converter(savedData: ISavedData): boolean {
         if ('ID' in savedData.trades[0] === false || 'exchangeID' in savedData.trades[0] === false) {
             changeMade = true;
             for (const trade of savedData.trades) {
-                trade.exchangeID = (trade as any).id;
-                delete (trade as any).id;
+                trade.exchangeID = (trade as IOldTrade).id;
+                delete (trade as Partial<IOldTrade>).id;
                 trade.ID = createID(trade);
             }
             // confirm no duplicates
@@ -24,4 +24,8 @@ export default function converter(savedData: ISavedData): boolean {
     }
 
     return changeMade;
+}
+
+interface IOldTrade extends ITradeWithFiatRate {
+    id: string;
 }

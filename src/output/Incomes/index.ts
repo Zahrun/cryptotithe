@@ -12,7 +12,7 @@ const headers = [
 export default function output(
     incomes: IIncomeWithValue[],
     fiatCurrency: string,
-) {
+): string {
     let csvData: string[] = [
         'Incxomes Export',
     ];

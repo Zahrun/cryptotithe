@@ -43,7 +43,8 @@ describe('Sort Trades', () => {
         );
 
         const randomizedTrades: ITradeWithFiatRate[] = [];
-        for (const _trade of trades) {
+        
+        for (let index = 0; index < trades.length; index++) {
             randomizedTrades.push(faker.helpers.randomize(trades));
         }
 

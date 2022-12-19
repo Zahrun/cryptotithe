@@ -3,7 +3,7 @@ import { getClosestHourPrice } from '../../getFiatRate/getClosestHourPrice';
 import { getDayAvg } from '../../getFiatRate/getDayAvgCurrencyRate';
 import { calculateAverageFromArray, calculateAvgerageHourPrice } from '../../getFiatRate/utils';
 
-export async function getBTCFiatRate(income: IIncome, fiatCurrency: string, method: FiatRateMethod) {
+export async function getBTCFiatRate(income: IIncome, fiatCurrency: string, method: FiatRateMethod): Promise<number> {
     switch (method) {
         case FiatRateMethod['Double Average']: {
             const dayAvg = await getDayAvg(fiatCurrency, 'BTC', income.date);

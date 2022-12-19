@@ -12,7 +12,7 @@ export interface ITimelineItem {
     defaultExpanded: boolean;
 }
 
-const getCurrencyHolding = (holdings: IHoldings, currency: string) => {
+const getCurrencyHolding = (holdings: IHoldings, currency: string): number => {
     let totalHoldings = 0;
     if (currency in holdings) {
         for (const holding of holdings[currency]) {
@@ -22,7 +22,7 @@ const getCurrencyHolding = (holdings: IHoldings, currency: string) => {
     return totalHoldings;
 };
 
-export const TimelineItem = ({trade, holdings, left, defaultExpanded}: ITimelineItem) => {
+export const TimelineItem = ({trade, holdings, left, defaultExpanded}: ITimelineItem): JSX.Element => {
     const [isOpen, setIsOpen] = useState(defaultExpanded);
 
     useEffect(() => setIsOpen(defaultExpanded), [defaultExpanded])

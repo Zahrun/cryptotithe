@@ -1,7 +1,7 @@
 import clone from 'clone';
 import { ICurrencyHolding, IHoldings, ITransaction } from '../../types';
 
-export default function processTransactions(transactions: ITransaction[], holdings: IHoldings) {
+export default function processTransactions(transactions: ITransaction[], holdings: IHoldings): IHoldings {
     const newHoldings = clone(holdings);
     for (const transaction of transactions) {
         let amountUsed = transaction.amount;

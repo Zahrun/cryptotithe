@@ -16,7 +16,7 @@ export interface IAlertBarProps {
 }
 
 export class AlertBar extends React.PureComponent<IAlertBarProps> {
-    public render() {
+    public render(): React.ReactNode{
         return (
             <div className={
                 classNames('alertbar lh-solid', {

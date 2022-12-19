@@ -3,7 +3,7 @@ import { getClosestHourPrice } from '../getClosestHourPrice';
 import { getDayAvg } from '../getDayAvgCurrencyRate';
 import { calculateAverageFromArray, calculateAvgerageHourPrice } from '../utils';
 
-export function BTCBasedRate(trade: ITrade, BTCFiatRate: number) {
+export function BTCBasedRate(trade: ITrade, BTCFiatRate: number): number {
     if (trade.boughtCurrency === 'BTC' || trade.boughtCurrency === 'XBT') {
         return BTCFiatRate * (trade.amountSold / trade.rate) / trade.amountSold;
     } else if (trade.soldCurrency === 'BTC' || trade.soldCurrency === 'XBT') {
@@ -13,7 +13,7 @@ export function BTCBasedRate(trade: ITrade, BTCFiatRate: number) {
     }
 }
 
-export async function getBTCFiatRate(trade: ITrade, fiatCurrency: string, method: FiatRateMethod) {
+export async function getBTCFiatRate(trade: ITrade, fiatCurrency: string, method: FiatRateMethod): Promise<number> {
     switch (method) {
         case FiatRateMethod['Double Average']: {
             const dayAvg = await getDayAvg(fiatCurrency, 'BTC', trade.date);

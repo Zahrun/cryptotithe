@@ -1,6 +1,6 @@
 import { IIncomeWithFiatRate, IIncomeWithValue } from "../../types";
 
-const calculateIncomesValue = (incomes: IIncomeWithFiatRate[]) => {
+const calculateIncomesValue = (incomes: IIncomeWithFiatRate[]): IIncomesTotalValue => {
     const newIncomes: IIncomeWithValue[] = [];
     let totalValue = 0;
 
@@ -21,3 +21,8 @@ const calculateIncomesValue = (incomes: IIncomeWithFiatRate[]) => {
 };
 
 export default calculateIncomesValue;
+
+export interface IIncomesTotalValue {
+    totalValue: number;
+    incomes: IIncomeWithValue[];
+}

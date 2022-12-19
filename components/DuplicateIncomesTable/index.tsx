@@ -10,7 +10,7 @@ export interface IDuplicateIncomesTableProps {
 }
 
 export class DuplicateIncomesTable extends React.PureComponent<IDuplicateIncomesTableProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Table
                 headers={[

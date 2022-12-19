@@ -1,4 +1,4 @@
-export default function keyByValue(value: any, object: Record<string, unknown>) {
+export default function keyByValue(value: unknown, object: Record<string, unknown>): undefined | string {
     const keys = Object.keys(object);
     for (const key of keys) {
         if (object[key] === value) {

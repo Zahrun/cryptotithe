@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { ReactNode, useContext, useState } from 'react';
 import SavedDataContext from '@contexts/savedData';
 import generateForm8949 from '../src/output/Form8949';
 import { calculateGainPerTrade, calculateGains } from '../src/processing/CalculateGains';
@@ -51,7 +51,7 @@ function recalculate(
     };
 }
 
-const Gains = () => {
+const Gains = (): ReactNode => {
     const {savedData} = useContext(SavedDataContext);
     const [filteredTradesWithGains, setFilteredTradesWithGains] = useState<ITradeWithGains[]>([]);
     const [holdings, setHoldings] = useState<IHoldings>(savedData.holdings);

@@ -5,7 +5,7 @@ export interface ITradeRate {
 }
 
 export class TradeRate extends React.PureComponent<ITradeRate> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div>
                 <span className='nowrap'>

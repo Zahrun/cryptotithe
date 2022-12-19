@@ -9,7 +9,7 @@ export interface ITableProps {
     rows: JSX.Element[][];
 }
 
-export function createHash(htmlElement: JSX.Element) {
+export function createHash(htmlElement: JSX.Element): string {
     if (typeof htmlElement !== 'object') {
         return crypto.createHash('sha256').update(htmlElement).digest('hex');
     } else {
@@ -33,13 +33,13 @@ export class Table extends React.Component<ITableProps, {page: number}> {
         };
     }
 
-    public moreTrades = (page: number) => {
+    public moreTrades = (page: number): void => {
         this.setState({
             page,
         });
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className='tradesTable pa4 overflow-hidden'>
                 <InfiniteScroll

@@ -2,7 +2,7 @@ export interface IItem {
     date: number;
 }
 
-export default function getYears<T extends IItem>(items: T[]) {
+export default function getYears<T extends IItem>(items: T[]): string[] {
     const years: string[] = [];
     items.forEach((item) => {
         const year = new Date(item.date).getFullYear();

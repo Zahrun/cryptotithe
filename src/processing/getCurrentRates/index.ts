@@ -68,6 +68,10 @@ export default async function getCurrentRates(
             throw Error('Unknown Error');
         }
     } catch (ex) {
-        throw Error(ex as any);
+        if (typeof ex === 'string') {
+            throw Error(ex);
+        } else {
+            throw Error('Unknown Error Occured');
+        }
     }
 }

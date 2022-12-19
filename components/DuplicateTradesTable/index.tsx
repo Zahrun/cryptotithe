@@ -10,7 +10,7 @@ export interface IDuplicateTradesTableProps {
 }
 
 export class DuplicateTradesTable extends React.PureComponent<IDuplicateTradesTableProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Table
                 headers={[

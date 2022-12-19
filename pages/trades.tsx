@@ -1,6 +1,7 @@
+import { ReactNode } from 'react';
 import TradesLayout from '../layouts/Trade';
 
-const Trades = () => (
+const Trades = (): ReactNode => (
     <TradesLayout />
 );
 

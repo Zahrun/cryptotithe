@@ -18,9 +18,9 @@ export default function outputForm8949(
     incomes: IIncomeWithFiatRate[],
     fiatCurrency: string,
     method: METHOD,
-) {
+): string {
     const result = calculateGainsPerHoldings(holdings, trades, incomes, fiatCurrency, method);
-    let csvData: any[] = [
+    let csvData: unknown[] = [
         'Form 8949 Statement',
         '',
         'Part 1 (Short-Term)',
@@ -34,7 +34,7 @@ export default function outputForm8949(
     return csvData.join('\n');
 }
 
-const fiatCurrencyDecimal = (value: number) => parseFloat(value.toFixed(2));
+const fiatCurrencyDecimal = (value: number): number => parseFloat(value.toFixed(2));
 
 function addTrades(trades: ITradeWithCostBasis[]) {
     let trueProceeds = 0;

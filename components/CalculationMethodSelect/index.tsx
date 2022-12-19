@@ -7,7 +7,7 @@ export interface ICalculationMethodSelectProps {
 }
 
 export default class CalculationMethodSelect extends React.PureComponent<ICalculationMethodSelectProps> {
-    public render() {
+    public render(): React.ReactNode {
         return (
             <HTMLSelect 
                 className='pl2'

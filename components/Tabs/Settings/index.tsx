@@ -8,7 +8,7 @@ export interface ISettingsProps {
     onClose: () => void;
 }
 
-function valueIfNotUndefined(object: any, key: string, fallback: string) {
+function valueIfNotUndefined<T>(object: ISettings, key: string, fallback: T): T {
     if (object !== undefined) {
         if (key in object) {
             return object[key];
@@ -22,13 +22,13 @@ export class Settings extends React.Component<ISettingsProps, ISettings> {
     public constructor(props: ISettingsProps) {
         super(props);
         this.state = {
-            fiatRateMethod: valueIfNotUndefined(props.settings, 'fiatRateMethod', Object.keys(FiatRateMethod)[0]),
+            fiatRateMethod: valueIfNotUndefined(props.settings, 'fiatRateMethod', Object.keys(FiatRateMethod)[0] as FiatRateMethod),
             fiatCurrency: valueIfNotUndefined(props.settings, 'fiatCurrency', 'USD'),
             gainCalculationMethod: valueIfNotUndefined(props.settings, 'gainCalculationMethod', METHOD.FIFO),
         };
     }
 
-    public onSettingsSave = async () => {
+    public onSettingsSave = async (): Promise<void> => {
         const result = await this.props.onSave({settings: this.state});
         if (result) {
             this.props.onClose();
@@ -37,7 +37,7 @@ export class Settings extends React.Component<ISettingsProps, ISettings> {
         }
     }
 
-    public onRefresh = async () => {
+    public onRefresh = async (): Promise<void> => {
         if (await this.props.onSave({})) {
             this.props.onClose();
         } else {
@@ -45,7 +45,7 @@ export class Settings extends React.Component<ISettingsProps, ISettings> {
         }
     }
 
-    public onChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    public onChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>): void => {
         switch (key) {
             case 'fiatRateMethod':
                 this.setState({fiatRateMethod: e.currentTarget.value as FiatRateMethod});
@@ -60,7 +60,7 @@ export class Settings extends React.Component<ISettingsProps, ISettings> {
 
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Dialog
                 title="Settings"

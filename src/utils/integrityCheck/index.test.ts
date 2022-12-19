@@ -6,6 +6,6 @@ describe('Integrity Check', () => {
         const savedData = createEmptySavedData();
         savedData.savedDate = new Date(0);
 
-        expect(integrityCheck(savedData)).toBe('4fb5283dccdd28fba64372dcdf5f7881e558f7f31facc429fb1f23685c24214e');
+        expect(integrityCheck(savedData)).toBe('b04cafb5e83eabe4a85182fb41b3ccc7741ad49b9cd3974f5bd3ac84bd3ffd65');
     });
 });

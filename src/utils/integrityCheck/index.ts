@@ -2,7 +2,7 @@ import clone from 'clone';
 import * as crypto from 'crypto';
 import { ISavedData } from './../../types';
 
-export default function integrityCheck(savedData: ISavedData) {
+export default function integrityCheck(savedData: ISavedData): string {
     const clonedData = clone(savedData);
     if ('integrity' in clonedData) {
         // eslint-disable-next-line

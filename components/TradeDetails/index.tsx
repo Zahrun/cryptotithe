@@ -59,15 +59,15 @@ export default class TradeDetails<TradeType extends ITrade> extends
         }
     }
 
-    public onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    public onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({ [key]: e.currentTarget.value });
     }
 
-    public onSelectChange = (key: string) => (value: string) => {
+    public onSelectChange = (key: string) => (value: string): void => {
         this.setState({ [key]: value });
     }
 
-    public onSubmit = () => {
+    public onSubmit = (): void => {
         const errors = [];
         const keys = Object.keys(this.state);
         for (const key of keys) {
@@ -158,7 +158,7 @@ export default class TradeDetails<TradeType extends ITrade> extends
         }
     }
 
-    public calculateRate = (boughtTimesSold: boolean) => {
+    public calculateRate = (boughtTimesSold: boolean): number => {
         if (
             this.state.amountBought && this.state.amountSold &&
             this.state.amountBought !== '0' && this.state.amountSold !== '0'
@@ -173,7 +173,7 @@ export default class TradeDetails<TradeType extends ITrade> extends
         }
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className={`TradeDetails w-70 center tc ${this.props.className}`}>
                 <div className='flex w-100 pa1'>

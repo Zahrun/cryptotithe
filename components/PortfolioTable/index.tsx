@@ -8,7 +8,7 @@ export interface IPortfolioTableProps {
     fiatCurrency: string;
 }
 
-function makeColorFul(amount: number) {
+function makeColorFul(amount: number): string {
     if (amount === 0) {
         return '';
     }
@@ -21,7 +21,7 @@ function makeColorFul(amount: number) {
 
 export class PortfolioTable extends React.PureComponent<IPortfolioTableProps> {
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Table
                 headers={[

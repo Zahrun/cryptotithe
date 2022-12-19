@@ -1,9 +1,11 @@
-import { IImport, IIncome, ImportType, ISavedData, ITrade, ITransaction } from '../../types';
+import { IImport, IIncome, IIncomeWithDuplicateProbability, ImportType, ISavedData, ITrade, ITradeWithDuplicateProbability, ITransaction, ITransactionWithDuplicateProbability } from '../../types';
 import DuplicateTradeCheck from './DuplicateTradeCheck';
 import DuplicateTransactionCheck from './DuplicateTransactionCheck';
 import DuplicateIncomeCheck from './DuplicateIncomeCheck';
 
-export default function duplicateCheck(importDetails: IImport, savedData: ISavedData, data: ITrade[] | ITransaction[] | IIncome[]) {
+export type DuplicateDataTypes = Array<ITransactionWithDuplicateProbability | ITradeWithDuplicateProbability |IIncomeWithDuplicateProbability>
+
+export default function duplicateCheck(importDetails: IImport, savedData: ISavedData, data: ITrade[] | ITransaction[] | IIncome[]): DuplicateDataTypes {
     switch (importDetails.type) {
         case ImportType.TRADES:
             return DuplicateTradeCheck(savedData.trades, data as ITrade[]);

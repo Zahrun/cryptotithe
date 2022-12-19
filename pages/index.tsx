@@ -3,7 +3,7 @@ import savedDataConverter from '../src/savedDataConverter';
 import integrityCheck from '@utils/integrityCheck';
 import { Dialog, Button, Intent } from "@blueprintjs/core";
 import { ISavedData, Pages } from '@types';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { createEmptySavedData } from 'src/mock';
 import { useRouter } from 'next/router';
 
@@ -13,7 +13,7 @@ export interface IIndexProps {
 
 const isSavedDataLoaded = (data: ISavedData) => data && data.trades.length + Object.keys(data.holdings).length > 0;
 
-const Index = ({ updateSaveData }: IIndexProps) => {
+const Index = ({ updateSaveData }: IIndexProps): ReactNode => {
     const [showLoadDataPopup, setShowLoadDataPopup] = useState(true);
     const [shouldOpenFileBrowse, setShouldOpenFileBrowse] = useState(false);
     const router = useRouter();

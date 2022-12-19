@@ -22,7 +22,7 @@ export default class TransactionFee extends React.Component<ITransactionFeeProp,
         };
     }
 
-    public componentDidUpdate(_prevProps: ITransactionFeeProp, prevState: ITransactionFeeState) {
+    public componentDidUpdate(_prevProps: ITransactionFeeProp, prevState: ITransactionFeeState): void {
         if (this.state.maxHolding !== prevState.maxHolding && !isNaN(this.state.maxHolding)) {
             const currencies = Object.keys(this.props.savedData.holdings);
             const smallHoldings = {};
@@ -44,11 +44,11 @@ export default class TransactionFee extends React.Component<ITransactionFeeProp,
         }
     }
 
-    public onMaxHoldingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    public onMaxHoldingChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({maxHolding: parseFloat(e.currentTarget.value)});
     }
 
-    public markTransactionFee = (currency: string) => () => {
+    public markTransactionFee = (currency: string) => (): void => {
         const newTrades =  this.props.savedData.trades;
         const currencyTrades = newTrades.filter((trade) => trade.boughtCurrency === currency);
         const lastTrade = currencyTrades[currencyTrades.length - 1];
@@ -59,7 +59,7 @@ export default class TransactionFee extends React.Component<ITransactionFeeProp,
         });
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className='TransactionFee'>
                 <div className='tc center'>

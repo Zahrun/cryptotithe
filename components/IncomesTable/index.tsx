@@ -20,11 +20,11 @@ export class IncomesTable extends React.Component<IIncomesTableProps, {popup: st
         };
     }
 
-    public changePopupStatus = (tradeID: string | undefined) => () => {
+    public changePopupStatus = (tradeID: string | undefined) => (): void => {
         this.setState({popup: tradeID});
     }
 
-    public editIncome = (originalID: string) => async (editedIncome: IIncome) => {
+    public editIncome = (originalID: string) => async (editedIncome: IIncome): Promise<void> => {
         const newIncomes = this.props.incomes.filter((trade) => trade.ID !== originalID);
         if ('fiatRate' in editedIncome) {
             const editedIncomeWithFiatRate = await addFiatRateToIncomes(
@@ -44,7 +44,7 @@ export class IncomesTable extends React.Component<IIncomesTableProps, {popup: st
     private isEditable = !!this.props.save;
     private showValue = 'fiatRate' in this.props.incomes[0];
 
-    private createHeaders = () => {
+    private createHeaders = (): string[] => {
         const headers = [
             'Date',
             'ID',
@@ -64,7 +64,7 @@ export class IncomesTable extends React.Component<IIncomesTableProps, {popup: st
         return headers;
     }
 
-    private createRow = (income: IIncome | IIncomeWithValue) => {
+    private createRow = (income: IIncome | IIncomeWithValue): JSX.Element[] => {
         const row = [
             <span>{new Date(income.date).toUTCString()}</span>,
             <span>{income.ID}</span>,
@@ -84,7 +84,7 @@ export class IncomesTable extends React.Component<IIncomesTableProps, {popup: st
         return row;
     }
 
-    private createRows = () => {
+    private createRows = (): JSX.Element[][] => {
         const rows = [];
         for (const income of this.props.incomes) {
             rows.push(this.createRow(income));   
@@ -93,7 +93,7 @@ export class IncomesTable extends React.Component<IIncomesTableProps, {popup: st
         return rows;
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div>
                 <Table

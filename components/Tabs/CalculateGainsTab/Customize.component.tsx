@@ -35,7 +35,7 @@ function createYearCalculationMethod(
     selectedYear: string,
     includePreviousYears: boolean,
     gainCalculationMethod: METHOD,
-) {
+): IYearCalculationMethod {
     const yearCalculationMethod = {};
     for (const year of years) {
         if (year === selectedYear || (includePreviousYears && year < selectedYear)) {
@@ -93,7 +93,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
         }
     }
 
-    public onSelectChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    public onSelectChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>): void => {
         switch (key) {
             case 'year': {
                 const year = e.currentTarget.value;
@@ -124,7 +124,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
         }
     }
 
-    public onCheckBoxChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    public onCheckBoxChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>): void => {
         this.setState({
             [key]: e.currentTarget.checked,
             yearCalculationMethod: createYearCalculationMethod(
@@ -136,7 +136,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
         });
     }
 
-    public onYearGainChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>) => {
+    public onYearGainChange = (key: string) => (e: React.ChangeEvent<HTMLSelectElement>): void => {
         const yearCalculationMethod = this.state.yearCalculationMethod;
         yearCalculationMethod[key] = e.currentTarget.value as METHOD;
         this.setState({
@@ -144,7 +144,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
         });
     }
 
-    public onAddOrRemoveYear = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    public onAddOrRemoveYear = (key: string) => (e: React.ChangeEvent<HTMLInputElement>): void => {
         const yearCalculationMethod = this.state.yearCalculationMethod;
         if (e.currentTarget.checked) {
             yearCalculationMethod[key] = e.currentTarget.value as METHOD;
@@ -156,7 +156,7 @@ export class Customize extends React.Component<ICustomizeProps, ICustomizeState>
         });
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <Popup
                 onClose={this.props.onClose}

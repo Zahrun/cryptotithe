@@ -27,15 +27,15 @@ export default class DailyBalance extends React.Component<IDailyBalanceProp, IDa
         };
     }
 
-    public onExchangeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    public onExchangeChange = async (e: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
         this.setState({exchange: e.currentTarget.value as EXCHANGES});
     }
 
-    public onYearChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    public onYearChange = async (e: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
         this.setState({year: parseInt(e.currentTarget.value, 10)});
     }
 
-    public calculateDailyBalance = async () => {
+    public calculateDailyBalance = async (): Promise<void> => {
         const dailyBalance = await calculateDailyBalance(
             this.props.savedData,
             this.state.year,
@@ -49,7 +49,7 @@ export default class DailyBalance extends React.Component<IDailyBalanceProp, IDa
         });
     }
 
-    public render() {
+    public render(): React.ReactNode {
         return (
             <div className='DailyBalance'>
                 <div className='center tc mt2'>
