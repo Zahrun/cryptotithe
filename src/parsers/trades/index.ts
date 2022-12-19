@@ -1,5 +1,6 @@
 import { EXCHANGES, ExchangesTradeHeaders, IImport, ITrade } from '@types';
 import * as crypto from 'crypto';
+import binance2Parser from './binance2'
 import binanceParser from './binance';
 import bittrexParser from './bittrex';
 import geminiParser from './gemini';
@@ -10,6 +11,7 @@ import revolutParser from './revolut';
 type ImportType = (importDetails: IImport) => Promise<ITrade[]>;
 
 const parserMapping: {[key in EXCHANGES]: ImportType} = {
+    [EXCHANGES.Binance2]: binance2Parser,
     [EXCHANGES.Binance]: binanceParser,
     [EXCHANGES.Bittrex]: bittrexParser,
     [EXCHANGES.Gemini]: geminiParser,
